@@ -1,0 +1,61 @@
+.manager{
+    color: #15762e;
+}
+
+table {
+    width: 100%;
+}
+
+table thead {
+    background: #ccc;
+}
+
+.employees-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.employees-section:hover button {
+    display: flex;
+}
+
+.employees-section button {
+    display: none;
+    background: #ddd;
+    border: none;
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    align-items: center;
+    justify-content: center;
+}
+
+.employees-section button:hover {
+    background: #ccc;
+}
+
+.employees-section button:active {
+    background: #ddd;
+}
+
+
+.income-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    background: #6cc76c;
+}
+
+.income-section button {
+    display: flex;
+    background: #4e9c4e;
+    border: none;
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    align-items: center;
+    justify-content: center;
+}

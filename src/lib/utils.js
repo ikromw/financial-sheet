@@ -1,0 +1,21 @@
+
+// Adding comma
+export const FixedNumber = (number) => {
+    return number.toLocaleString()
+}
+
+// Total income
+export const calculateTotalIncome = (employees) =>
+    employees.reduce(
+        (total, employee) =>
+            total + employee.incomes.reduce((sum, income) => sum + income, 0),
+        0
+    );
+
+// Added each salaries which is percented for Net income
+export const calculateAddedSalaries = (employees, percent) =>
+    employees.map(
+        (employee) =>
+            (employee.incomes.reduce((sum, income) => sum + income, 0) * percent) /
+            100
+    );
