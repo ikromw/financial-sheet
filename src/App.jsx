@@ -1,54 +1,31 @@
 import "./App.css";
 import EmployeeForm from "./components/EmployeeForm";
-import { all_employees } from "../db/db";
+import { test_data } from "./db/db";
 import { FixedNumber, calculateTotalIncome, calculateAddedSalaries } from "./lib/utils";
 import { useState } from "react";
 
 const PERCENT = 10;
 
-const other_inomce = all_employees.length < 0 ? 0 : all_employees[0].incomes.map((_, index) => 0);
+
 function App() {
-  const [data, setData] = useState(all_employees);
-  const [employeeFormData, setEmployeeFormData] = useState({
-    name: "",
-    is_manager: false,
-    incomes: other_inomce
-  });
+  const [data, setData] = useState(test_data)
+  const []
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    // Handle checkbox state for is_manager
-    if (type === "checkbox") {
-      setEmployeeFormData({
-        ...employeeFormData,
-        [name]: checked,
-      });
-    } else {
-      setEmployeeFormData({
-        ...employeeFormData,
-        [name]: value,
-      });
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setData([...data, employeeFormData]);
-    setEmployeeFormData({ name: "", is_manager: false, incomes: other_inomce }); // Reset the form data
-  };
-
+  // Handle employee form component
+  const handleFormSubmit = (formData) => {
+    setData([...data, formData]);
+  }
 
   // Simple utills from utility
   const managers = data.filter((manager) => manager.is_manager == true);
-  const total_income = calculateTotalIncome(all_employees)
+  const total_income = calculateTotalIncome(data)
   const net_income = total_income - (calculateAddedSalaries(data, PERCENT).reduce((accumulator, currentValue) => accumulator + currentValue, 0));
 
   if (!data || data.length === 0) {
     return (
       <>
         <p>No employees available!</p>
-        <EmployeeForm></EmployeeForm>
+        <EmployeeForm onSubmit={handleFormSubmit}></EmployeeForm>
       </>
     );
   }
@@ -86,39 +63,33 @@ function App() {
           ))
           : "No employees yet!"}
       </ul>
+      <EmployeeForm onSubmit={handleFormSubmit} />
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          aria-label="Employee name"
-          value={employeeFormData.name}
-          placeholder="Name"
-          onChange={handleChange}
-          required
-        />
 
-        <label htmlFor="is_manager">Is manager?</label>
-        <input
-          type="checkbox"
-          id="is_manager"
-          name="is_manager"
-          aria-label="Ask if employee is manager"
-          checked={employeeFormData.is_manager}
-          onChange={handleChange}
-        />
 
-        <button type="submit">Add</button>
+      <br />
+      <br />
+
+      <form action="">
+        <select name="" id="">
+          {data.map((employee, index) => (
+            <option
+              key={index}
+              value={employee.name}
+            >{employee.name}</option>
+          ))}
+        </select>
+        <input type="number" />
+        <button>cancel</button>
+        <button>add</button>
       </form>
-
-      <br />
-      <br />
 
       <div className="income-section">
         <p className="table--title-incomes">Incomes</p>
 
         <button>+</button>
       </div>
+
       {data.length > 0 ? (
         <table className="table incomes">
           <thead>
@@ -133,7 +104,6 @@ function App() {
             {data[0].incomes.map((_, rowIndex) => (
               <tr key={rowIndex}>
                 <td>{rowIndex + 1}</td>
-
                 {data.map((employee, colIndex) => (
                   <td key={colIndex}>{FixedNumber(employee.incomes[rowIndex]) || "-"}</td>
                 ))}
@@ -141,9 +111,7 @@ function App() {
             ))}
           </tbody>
         </table>
-      ) : (
-        "No employees yet!"
-      )}
+      ) : ("No employees yet!")}
       <br />
       <hr />
       <h4>Total Income: {FixedNumber(total_income)}</h4>
@@ -170,7 +138,7 @@ function App() {
       <br />
       <hr />
       <h4>Net Income: {FixedNumber(net_income)}</h4>
-    </main>
+    </main >
   );
 }
 

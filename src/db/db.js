@@ -1,9 +1,7 @@
-export const all_employees = [
+export const test_data = [
     {
         name: "Admin",
         is_manager: true,
         incomes: [0]
     }
 ]
-
-export const date = [1, 2]

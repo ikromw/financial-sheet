@@ -12,7 +12,7 @@ export const calculateTotalIncome = (employees) =>
         0
     );
 
-// Added each salaries which is percented for Net income
+// Added each employees' salary which is percented for net income
 export const calculateAddedSalaries = (employees, percent) =>
     employees.map(
         (employee) =>
