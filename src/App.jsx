@@ -1,7 +1,7 @@
 import "./App.css";
 import EmployeeForm from "./components/EmployeeForm";
 import { test_data } from "./db/db";
-import { FixedNumber, calculateTotalIncome, calculateAddedSalaries } from "./lib/utils";
+import { FixedNumber } from "./lib/utils";
 import { useState } from "react";
 
 const PERCENT = 10;
@@ -11,21 +11,13 @@ function App() {
   const [data, setData] = useState(test_data)
   const [incomeFormData, setIncomeFormData] = useState({
     employee: "",
-    income: 0
+    records: {
+      date: new Date(),
+      income: 0,
+      expense: 0
+    }
   })
 
-  const handleChangeIncomeFormData = (e) => {
-    const { name, value } = e.target;
-
-    setIncomeFormData({
-      ...incomeFormData,
-      [name]: value, // Use 'value' for all inputs
-    });
-  };
-  const handleChangeIncomeFormSubmit = (e) => {
-    e.preventDefault();
-    
-  }
 
   // Handle employee form component
   const handleFormSubmit = (formData) => {
@@ -34,19 +26,12 @@ function App() {
 
   // Simple utills from utility
   const managers = data.filter((manager) => manager.is_manager == true);
-  const total_income = calculateTotalIncome(data)
-  const net_income = total_income - (calculateAddedSalaries(data, PERCENT).reduce((accumulator, currentValue) => accumulator + currentValue, 0));
 
-  if (!data || data.length === 0) {
-    return (
-      <>
-        <p>No employees available!</p>
-        <EmployeeForm onSubmit={handleFormSubmit}></EmployeeForm>
-      </>
-    );
-  }
+
+
   return (
     <main>
+
       <h2>
         {managers.length < 2 ? "Manager:" : "Managers:"}
         {managers.length > 0 ? (
@@ -84,84 +69,49 @@ function App() {
       <br />
       <br />
 
-      <form onSubmit={handleChangeIncomeFormSubmit}>
-        <select
-          name="employee"
-          required
-          onChange={handleChangeIncomeFormData}>
-          {data.map((employee, index) => (
-            <option
-              key={index}
-              value={employee.name}
-            >{employee.name}</option>
-          ))}
-        </select>
-
-        <input
-          required
-          name="income"
-          type="number"
-          onChange={handleChangeIncomeFormData}
-          value={incomeFormData.income}
-        />
-        <button>cancel</button>
-        <button type="submit">add</button>
-      </form>
-
       <div className="income-section">
         <p className="table--title-incomes">Incomes</p>
 
         <button>+</button>
       </div>
 
-      {data.length > 0 ? (
-        <table className="table incomes">
-          <thead>
-            <tr>
-              <td>#</td>
-              {data.map((manager, index) => (
-                <td key={index}>{manager.name}</td>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data[0].incomes.map((_, rowIndex) => (
-              <tr key={rowIndex}>
-                <td>{rowIndex + 1}</td>
-                {data.map((employee, colIndex) => (
-                  <td key={colIndex}>{FixedNumber(employee.incomes[rowIndex]) || "-"}</td>
-                ))}
+      <table className="table incomes">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Income</th>
+            <th>Expense</th>
+            <th>Net Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            data.map((employee, employeeIndex) => {
+              <tr>
+                <td>{employee.name}</td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : ("No employees yet!")}
+            })
+          }
+        </tbody>
+      </table>
+
       <br />
       <hr />
-      <h4>Total Income: {FixedNumber(total_income)}</h4>
+      <h4>Total Income: test</h4>
 
       <br />
 
       <details>
         <summary>Salaries ({PERCENT}%)</summary>
         <ul>
-          {data.length > 0
-            ? data.map((employee, index) => (
-              <ol key={index}>
-                {employee.name}:{" "}
-                {FixedNumber(
-                  (employee.incomes.reduce((accumulator, currentValue) => accumulator + currentValue, 0) * PERCENT) / 100
-                )}
-                /{FixedNumber(employee.incomes.reduce((accumulator, currentValue) => accumulator + currentValue, 0))}
-              </ol>
-            ))
-            : "Your company has no employees yet!"}
+          <ol>Test</ol>
         </ul>
       </details>
 
       <br />
       <hr />
-      <h4>Net Income: {FixedNumber(net_income)}</h4>
+      <h4>Net Income: test</h4>
     </main >
   );
 }

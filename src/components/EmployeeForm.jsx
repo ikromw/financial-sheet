@@ -5,7 +5,11 @@ const EmployeeForm = ({ onSubmit }) => {
     const [employeeFormData, setEmployeeFormData] = useState({
         name: "",
         is_manager: false,
-        incomes: test_data[0].incomes.map((_) => 0)
+        records: {
+            date: new Date().toLocaleDateString(),
+            income: 0,
+            expense: 0
+        }
     });
 
     const handleChange = (e) => {
@@ -20,7 +24,9 @@ const EmployeeForm = ({ onSubmit }) => {
         e.preventDefault();
 
         onSubmit(employeeFormData);
-        setEmployeeFormData({ name: "", is_manager: false, incomes: test_data[0].incomes.map((_) => 0) }); // Reset the form data
+
+        console.log("Employee data is added to the database via (Handle Submit Function): ");
+        console.table(employeeFormData);
     };
 
 
@@ -36,7 +42,7 @@ const EmployeeForm = ({ onSubmit }) => {
                 required
             />
 
-            
+
             <label htmlFor="is_manager">{employeeFormData.is_manager ? "Manager" : "Is manager?"}</label>
             <input
                 type="checkbox"

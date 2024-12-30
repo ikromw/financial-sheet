@@ -6,10 +6,8 @@ export const FixedNumber = (number) => {
 
 // Total income
 export const calculateTotalIncome = (employees) =>
-    employees.reduce(
-        (total, employee) =>
-            total + employee.incomes.reduce((sum, income) => sum + income, 0),
-        0
+    employees.reduce((total, employee) =>
+        total + employee.incomes.reduce((sum, income) => sum + income, 0), 0
     );
 
 // Added each employees' salary which is percented for net income
