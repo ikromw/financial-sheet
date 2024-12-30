@@ -11,25 +11,16 @@ const EmployeeForm = ({ onSubmit }) => {
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
 
-        // Handle checkbox state for is_manager
-        if (type === "checkbox") {
-            setEmployeeFormData({
-                ...employeeFormData,
-                [name]: checked,
-            });
-        } else {
-            setEmployeeFormData({
-                ...employeeFormData,
-                [name]: value,
-            });
-        }
+        setEmployeeFormData({
+            ...employeeFormData, [name]: type === "checkbox" ? checked : value,
+        });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
         onSubmit(employeeFormData);
-        setEmployeeFormData({ name: "", is_manager: false, incomes:  test_data[0].incomes.map((_) => 0) }); // Reset the form data
+        setEmployeeFormData({ name: "", is_manager: false, incomes: test_data[0].incomes.map((_) => 0) }); // Reset the form data
     };
 
 
@@ -45,7 +36,8 @@ const EmployeeForm = ({ onSubmit }) => {
                 required
             />
 
-            <label htmlFor="is_manager">Is manager?</label>
+            
+            <label htmlFor="is_manager">{employeeFormData.is_manager ? "Manager" : "Is manager?"}</label>
             <input
                 type="checkbox"
                 id="is_manager"

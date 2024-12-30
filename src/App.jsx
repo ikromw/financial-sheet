@@ -9,7 +9,23 @@ const PERCENT = 10;
 
 function App() {
   const [data, setData] = useState(test_data)
-  const []
+  const [incomeFormData, setIncomeFormData] = useState({
+    employee: "",
+    income: 0
+  })
+
+  const handleChangeIncomeFormData = (e) => {
+    const { name, value } = e.target;
+
+    setIncomeFormData({
+      ...incomeFormData,
+      [name]: value, // Use 'value' for all inputs
+    });
+  };
+  const handleChangeIncomeFormSubmit = (e) => {
+    e.preventDefault();
+    
+  }
 
   // Handle employee form component
   const handleFormSubmit = (formData) => {
@@ -65,13 +81,14 @@ function App() {
       </ul>
       <EmployeeForm onSubmit={handleFormSubmit} />
 
-
-
       <br />
       <br />
 
-      <form action="">
-        <select name="" id="">
+      <form onSubmit={handleChangeIncomeFormSubmit}>
+        <select
+          name="employee"
+          required
+          onChange={handleChangeIncomeFormData}>
           {data.map((employee, index) => (
             <option
               key={index}
@@ -79,9 +96,16 @@ function App() {
             >{employee.name}</option>
           ))}
         </select>
-        <input type="number" />
+
+        <input
+          required
+          name="income"
+          type="number"
+          onChange={handleChangeIncomeFormData}
+          value={incomeFormData.income}
+        />
         <button>cancel</button>
-        <button>add</button>
+        <button type="submit">add</button>
       </form>
 
       <div className="income-section">
