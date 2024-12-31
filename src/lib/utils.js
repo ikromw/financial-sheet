@@ -1,6 +1,6 @@
 
 // Adding comma
-export const FixedNumber = (number) => {
+export const PriceFormat = (number) => {
     return number.toLocaleString()
 }
 

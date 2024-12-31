@@ -1,32 +1,27 @@
 import { useState } from "react";
-import { test_data } from "../db/db";
 
-const EmployeeForm = ({ onSubmit }) => {
-    const [employeeFormData, setEmployeeFormData] = useState({
+const UsersForm = ({ onSubmit }) => {
+    const [employeeFormSchema, setEmployeeFormSchema] = useState({
         name: "",
         is_manager: false,
-        records: {
-            date: new Date().toLocaleDateString(),
-            income: 0,
-            expense: 0
-        }
     });
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
 
-        setEmployeeFormData({
-            ...employeeFormData, [name]: type === "checkbox" ? checked : value,
+        setEmployeeFormSchema({
+            ...employeeFormSchema, [name]: type === "checkbox" ? checked : value,
         });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        onSubmit(employeeFormData);
-
-        console.log("Employee data is added to the database via (Handle Submit Function): ");
-        console.table(employeeFormData);
+        onSubmit(employeeFormSchema);
+        setEmployeeFormSchema({
+            name: "",
+            is_manager: false,
+        })
     };
 
 
@@ -36,20 +31,20 @@ const EmployeeForm = ({ onSubmit }) => {
                 type="text"
                 name="name"
                 aria-label="Employee name"
-                value={employeeFormData.name}
+                value={employeeFormSchema.name}
                 placeholder="Name"
                 onChange={handleChange}
                 required
             />
 
 
-            <label htmlFor="is_manager">{employeeFormData.is_manager ? "Manager" : "Is manager?"}</label>
+            <label htmlFor="is_manager">{employeeFormSchema.is_manager ? "Manager" : "Is manager?"}</label>
             <input
                 type="checkbox"
                 id="is_manager"
                 name="is_manager"
                 aria-label="Ask if employee is manager"
-                checked={employeeFormData.is_manager}
+                checked={employeeFormSchema.is_manager}
                 onChange={handleChange}
             />
 
@@ -58,4 +53,4 @@ const EmployeeForm = ({ onSubmit }) => {
     )
 }
 
-export default EmployeeForm
+export default UsersForm

@@ -1,9 +1,12 @@
-.manager{
+.manager {
     color: #15762e;
 }
 
 table {
     width: 100%;
+}
+table tbody tr{
+    border-bottom: 1px solid red;
 }
 
 table thead {

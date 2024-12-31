@@ -1,39 +1,86 @@
 import "./App.css";
-import EmployeeForm from "./components/EmployeeForm";
-import { test_data } from "./db/db";
-import { FixedNumber } from "./lib/utils";
+import UsersForm from "./components/UsersForm";
+import IncomeForm from "./components/IncomeForm";
+import { test_data, users } from "./db/db";
+import { PriceFormat } from "./lib/utils";
 import { useState } from "react";
 
 const PERCENT = 10;
 
 
 function App() {
+  const [usersData, setUsersData] = useState(users)
+  const [userDataForm, setUserDataForm] = useState(false)
+
   const [data, setData] = useState(test_data)
-  const [incomeFormData, setIncomeFormData] = useState({
-    employee: "",
-    records: {
-      date: new Date(),
+  const [dataForm, setDataForm] = useState(false)
+  const [dataFormSchema, setDataFormSchema] = useState(
+    {
+      name: "",
+      date: new Date().toLocaleDateString(),
       income: 0,
       expense: 0
     }
-  })
+  )
 
 
-  // Handle employee form component
+
+  // Handle users form component
   const handleFormSubmit = (formData) => {
-    setData([...data, formData]);
+    setUsersData([...usersData, formData]);
   }
 
-  // Simple utills from utility
-  const managers = data.filter((manager) => manager.is_manager == true);
+  // Handle main income data
+  const handleIncomeFormSubmit = (e) => {
+    e.preventDefault();
+    console.log("Data Form Schema: ", dataFormSchema);
 
+    // Find the existing entry for the current name (if any)
+    const existingEntryIndex = data.findIndex((item) => item.name === dataFormSchema.name);
+
+    if (existingEntryIndex !== -1) {
+      // If an entry exists, update its records
+      const updatedData = [...data];
+      updatedData[existingEntryIndex].records.push({
+        date: dataFormSchema.date,
+        income: parseFloat(dataFormSchema.income), // Parse income as a number
+        expense: parseFloat(dataFormSchema.expense), // Parse expense as a number
+      });
+      setData(updatedData);
+    } else {
+      // If no entry exists, create a new one
+      setData([
+        ...data,
+        {
+          name: dataFormSchema.name,
+          records: [
+            {
+              date: dataFormSchema.date,
+              income: parseFloat(dataFormSchema.income), // Parse income as a number
+              expense: parseFloat(dataFormSchema.expense), // Parse expense as a number
+            },
+          ],
+        },
+      ]);
+    }
+
+    setDataFormSchema({
+      name: "",
+      date: new Date().toLocaleDateString(),
+      income: 0,
+      expense: 0
+    })
+  }
+
+  // Seperated managers from employees
+  const managers = usersData.filter((manager) => manager.is_manager === true);
 
 
   return (
     <main>
 
       <h2>
-        {managers.length < 2 ? "Manager:" : "Managers:"}
+        {managers.length < 2 ? "Manager: " : "Managers: "}
         {managers.length > 0 ? (
           managers.map((manager, index) => (
             <span key={index}> {manager.name}{index < managers.length - 1 ? ", " : ""}</span>
@@ -48,31 +95,52 @@ function App() {
       <br />
 
       <div className="employees-section">
-        {data.length < 2 ? <h2>Employee</h2> : <h2>Employees</h2>}
+        {usersData.length < 2 ? <h2>Employee</h2> : <h2>Employees</h2>}
 
-        <button>+</button>
+        <button onClick={() => setUserDataForm(!userDataForm)}>
+          {userDataForm ? "-" : "+"}
+        </button>
       </div>
 
       <br />
 
       <ul>
-        {data.length > 0
-          ? data.map((manager, index) => (
-            <ol key={index} className={manager.is_manager ? "manager" : "employee"}>
-              {manager.name}
+        {usersData.length > 0
+          ? usersData.map((employee, index) => (
+            <ol key={index} className={employee.is_manager ? "manager" : "employee"}>
+              {employee.name}
             </ol>
           ))
           : "No employees yet!"}
+
       </ul>
-      <EmployeeForm onSubmit={handleFormSubmit} />
+      {userDataForm && <UsersForm onSubmit={handleFormSubmit} />}
 
       <br />
       <br />
+
+      {dataForm && (
+        <IncomeForm
+          usersData={usersData}
+          onSubmit={handleIncomeFormSubmit}
+          dataFormSchema={dataFormSchema}
+          setDataFormSchema={setDataFormSchema}
+        />
+      )}
+
 
       <div className="income-section">
         <p className="table--title-incomes">Incomes</p>
 
-        <button>+</button>
+        {
+          usersData.length > 0 ?
+            <button onClick={() => setDataForm(!dataForm)}>
+              {dataForm ? "-" : "+"}
+            </button>
+            :
+            null
+        }
+
       </div>
 
       <table className="table incomes">
@@ -87,11 +155,22 @@ function App() {
         </thead>
         <tbody>
           {
-            data.map((employee, employeeIndex) => {
-              <tr>
-                <td>{employee.name}</td>
-              </tr>
-            })
+            usersData.length == 0 ?
+              "You have to add employees first!" :
+              data.length === 0 ? "You can add income via plus button at right corner." :
+                data.map((employee) =>
+                  employee.records.map((record, recordIndex) => (
+                    <tr key={recordIndex}>
+                      {recordIndex === 0 && (
+                        <td rowSpan={employee.records.length}>{employee.name}</td>
+                      )}
+                      <td>{record.date}</td>
+                      <td>{PriceFormat(record.income)}</td>
+                      <td>{PriceFormat(record.expense)}</td>
+                      <td>{PriceFormat(record.income - record.expense)}</td>
+                    </tr>
+                  ))
+                )
           }
         </tbody>
       </table>
