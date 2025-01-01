@@ -2,12 +2,9 @@ import "./App.css";
 import UsersForm from "./components/UsersForm";
 import IncomeForm from "./components/IncomeForm";
 import { test_data, users } from "./db/db";
-import { PriceFormat, calculateTotalIncome } from "./lib/utils";
-import { useState } from "react";
+import { PriceFormat, calculateTotalIncomes, calculateEmployeeSalaries, calculateTotalExpenses } from "./lib/utils";
+import { useState, useMemo } from "react";
 import { MSGS, DEFAULT_PERCENT } from "./lib/settings";
-
-const PERCENT = 10;
-
 
 function App() {
   const [usersData, setUsersData] = useState(users)
@@ -23,8 +20,6 @@ function App() {
       expense: 0
     }
   )
-
-
 
   // Handle users form component
   const handleFormSubmit = (formData) => {
@@ -73,10 +68,11 @@ function App() {
     })
     setDataForm(false)
   }
-
-  // Calcluted total income
-  const totalIncome = calculateTotalIncome(data);
-
+  
+  // Utills
+  const salaries = calculateEmployeeSalaries(data, DEFAULT_PERCENT);
+  const totalIncomes = useMemo(() => calculateTotalIncomes(data), [data]);
+  const totalExpenses = useMemo(() => calculateTotalExpenses(data), [data]);
 
   // Seperated managers from employees
   const managers = usersData.filter((manager) => manager.is_manager === true);
@@ -181,42 +177,26 @@ function App() {
 
       <br />
       <hr />
-      <h4>Total Income: {PriceFormat(totalIncome)}</h4>
+      <h4>Total Income: {PriceFormat(totalIncomes)}</h4>
+      <h4>Total Expense: {PriceFormat(totalExpenses)}</h4>
 
       <br />
 
       <details>
         <summary>Salaries ({DEFAULT_PERCENT}%)</summary>
-
-
         <ul>
           {
-            data.length === 0 ? MSGS.route_the_form :
-              data.map((employee, index) => {
-                const totalSalary = employee.records.reduce((sum, record) => sum += record.income * DEFAULT_PERCENT / 100, 0);
-                const expenses = employee.records.reduce((sum, record) => sum += record.expense, 0)
-                return (
-                  <ol key={index}>{employee.name}: {PriceFormat(totalSalary - expenses)}</ol>
-                )
-              })
+            salaries.map(employee =>
+              <ol key={employee.name}>{employee.name}: {PriceFormat(employee.netSalary)}</ol>
+            )
           }
         </ul>
       </details>
 
+
       <br />
       <hr />
-      <h4>Net Income:
-        {
-          data.length === 0 ? MSGS.route_the_form :
-            data.map((employee, index) => {
-              const totalSalary = employee.records.reduce((sum, record) => sum += record.income * DEFAULT_PERCENT / 100, 0);
-              const expenses = employee.records.reduce((sum, record) => sum += record.expense, 0)
-              const netPrices = totalIncome - (totalSalary - expenses)
-
-              return console.log(netPrices);
-            })
-        }
-      </h4>
+      <h4>Net Income: 0</h4>
     </main >
   );
 }

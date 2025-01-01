@@ -5,4 +5,4 @@ export const MSGS = {
     route_the_form: "You can add income via plus button at right corner."
 }
 
-export const DEFAULT_PERCENT = 12;
+export const DEFAULT_PERCENT = 10;
