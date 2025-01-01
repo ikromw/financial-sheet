@@ -1,16 +1,17 @@
 import "./App.css";
 import UsersForm from "./components/UsersForm";
 import IncomeForm from "./components/IncomeForm";
-import { test_data, users } from "./db/db";
+import { test_data, users, SET_INCOME_DATA, GET_INCOME_DATA } from "./db/db";
 import { PriceFormat, calculateTotalIncomes, calculateEmployeeSalaries, calculateTotalExpenses, calculateNetIncome } from "./lib/utils";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { MSGS, DEFAULT_PERCENT } from "./lib/settings";
 
 function App() {
   const [usersData, setUsersData] = useState(users)
   const [userDataForm, setUserDataForm] = useState(false)
 
-  const [data, setData] = useState(test_data)
+  const [data, setData] = useState([])
+
   const [dataForm, setDataForm] = useState(false)
   const [dataFormSchema, setDataFormSchema] = useState(
     {
@@ -158,7 +159,7 @@ function App() {
           {
             usersData.length == 0 ?
               MSGS.employee_add_form :
-              data.length === 0 ? MSGS.route_the_form :
+              data.length === 0 ? MSGS.no_income :
                 data.map((employee) =>
                   employee.records.map((record, recordIndex) => (
                     <tr key={recordIndex}>
@@ -187,9 +188,12 @@ function App() {
         <summary>Salaries ({DEFAULT_PERCENT}%)</summary>
         <ul>
           {
-            salaries.map(employee =>
-              <ol key={employee.name}>{employee.name}: {PriceFormat(employee.netSalary)}</ol>
-            )
+            salaries.length > 0 ?
+              salaries.map(employee =>
+                <ol key={employee.name}>{employee.name}: {PriceFormat(employee.netSalary)}</ol>
+              )
+              :
+              MSGS.no_income
           }
         </ul>
       </details>
