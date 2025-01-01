@@ -1,4 +1,3 @@
-
 // Custom format for prices
 export const PriceFormat = (number) => {
     return number.toLocaleString()
@@ -17,7 +16,6 @@ export const calculateTotalIncomes = (data) => {
 }
 
 // Total expenses
-let netSalaries = []
 export const calculateTotalExpenses = (data) => {
     if (data.length === 0) {
         return console.log("Total Expenses data length = 0");
@@ -48,7 +46,6 @@ export const calculateEmployeeSalaries = (data, DEFAULT_PERCENT) => {
             0
         );
         const netSalary = totalSalary - expenses;
-        netSalaries.push(netSalary)
 
         return {
             name: employee.name,
@@ -58,6 +55,12 @@ export const calculateEmployeeSalaries = (data, DEFAULT_PERCENT) => {
 };
 
 // Net income
-export const calculateNetIncome = (data) => {
+export const calculateNetIncome = (data, DEFAULT_PERCENT) => {
+    if (data.length === 0) {
+        return [];
+    }
+
+    let totalSalaries = data.map((employee) => employee.records.reduce((sum, record) => sum + record.income * (DEFAULT_PERCENT / 100), 0))
     
+    return totalSalaries.reduce((sum, record) => sum + record);
 }

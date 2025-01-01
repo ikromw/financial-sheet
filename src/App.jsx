@@ -2,7 +2,7 @@ import "./App.css";
 import UsersForm from "./components/UsersForm";
 import IncomeForm from "./components/IncomeForm";
 import { test_data, users } from "./db/db";
-import { PriceFormat, calculateTotalIncomes, calculateEmployeeSalaries, calculateTotalExpenses } from "./lib/utils";
+import { PriceFormat, calculateTotalIncomes, calculateEmployeeSalaries, calculateTotalExpenses, calculateNetIncome } from "./lib/utils";
 import { useState, useMemo } from "react";
 import { MSGS, DEFAULT_PERCENT } from "./lib/settings";
 
@@ -68,11 +68,12 @@ function App() {
     })
     setDataForm(false)
   }
-  
+
   // Utills
   const salaries = calculateEmployeeSalaries(data, DEFAULT_PERCENT);
   const totalIncomes = useMemo(() => calculateTotalIncomes(data), [data]);
   const totalExpenses = useMemo(() => calculateTotalExpenses(data), [data]);
+  const netIncome = useMemo(() => calculateNetIncome(data, DEFAULT_PERCENT), [data])
 
   // Seperated managers from employees
   const managers = usersData.filter((manager) => manager.is_manager === true);
@@ -165,9 +166,9 @@ function App() {
                         <td className="no-color" rowSpan={employee.records.length}>{employee.name}</td>
                       )}
                       <td>{record.date}</td>
-                      <td>{PriceFormat(record.income)}</td>
-                      <td>{PriceFormat(record.expense)}</td>
-                      <td>{PriceFormat(record.income - record.expense)}</td>
+                      <td>{record.income && PriceFormat(record.income)}</td>
+                      <td>{record.expense && PriceFormat(record.expense)}</td>
+                      <td>{record.income && PriceFormat(record.income - record.expense)}</td>
                     </tr>
                   ))
                 )
@@ -177,8 +178,8 @@ function App() {
 
       <br />
       <hr />
-      <h4>Total Income: {PriceFormat(totalIncomes)}</h4>
-      <h4>Total Expense: {PriceFormat(totalExpenses)}</h4>
+      <h4>Total Income: {totalIncomes && PriceFormat(totalIncomes)}</h4>
+      <h4>Total Expense: {totalExpenses && PriceFormat(totalExpenses)}</h4>
 
       <br />
 
@@ -196,7 +197,7 @@ function App() {
 
       <br />
       <hr />
-      <h4>Net Income: 0</h4>
+      <h4>Net Income: {totalIncomes && PriceFormat(totalIncomes - netIncome)}</h4>
     </main >
   );
 }
