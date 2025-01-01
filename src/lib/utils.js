@@ -5,15 +5,9 @@ export const PriceFormat = (number) => {
 }
 
 // Total income
-export const calculateTotalIncome = (employees) =>
-    employees.reduce((total, employee) =>
-        total + employee.incomes.reduce((sum, income) => sum + income, 0), 0
-    );
-
-// Added each employees' salary which is percented for net income
-export const calculateAddedSalaries = (employees, percent) =>
-    employees.map(
-        (employee) =>
-            (employee.incomes.reduce((sum, income) => sum + income, 0) * percent) /
-            100
-    );
+export const calculateTotalIncome = (data) => {
+    const totalIncome = data.map(employee =>
+        employee.records.reduce((sum, record) => sum += record.income, 0)
+    )
+    return totalIncome.reduce((sum, income) => sum + income, 0)
+}

@@ -5,11 +5,16 @@
 table {
     width: 100%;
 }
-table tbody tr{
-    border-bottom: 1px solid red;
-}
 
 table thead {
+    background: #ccc;
+}
+.no-color{
+    position: relative;
+    background: #ccc !important;
+}
+
+table tbody tr:nth-child(even) {
     background: #ccc;
 }
 

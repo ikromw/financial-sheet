@@ -2,8 +2,9 @@ import "./App.css";
 import UsersForm from "./components/UsersForm";
 import IncomeForm from "./components/IncomeForm";
 import { test_data, users } from "./db/db";
-import { PriceFormat } from "./lib/utils";
+import { PriceFormat, calculateTotalIncome } from "./lib/utils";
 import { useState } from "react";
+import { MSGS, DEFAULT_PERCENT } from "./lib/settings";
 
 const PERCENT = 10;
 
@@ -70,7 +71,12 @@ function App() {
       income: 0,
       expense: 0
     })
+    setDataForm(false)
   }
+
+  // Calcluted total income
+  const totalIncome = calculateTotalIncome(data);
+
 
   // Seperated managers from employees
   const managers = usersData.filter((manager) => manager.is_manager === true);
@@ -85,9 +91,7 @@ function App() {
           managers.map((manager, index) => (
             <span key={index}> {manager.name}{index < managers.length - 1 ? ", " : ""}</span>
           ))
-        ) : (
-          "No manager yet!"
-        )}
+        ) : (MSGS.no_manager)}
       </h2>
 
       <br />
@@ -111,7 +115,7 @@ function App() {
               {employee.name}
             </ol>
           ))
-          : "No employees yet!"}
+          : (MSGS.no_employee)}
 
       </ul>
       {userDataForm && <UsersForm onSubmit={handleFormSubmit} />}
@@ -156,13 +160,13 @@ function App() {
         <tbody>
           {
             usersData.length == 0 ?
-              "You have to add employees first!" :
-              data.length === 0 ? "You can add income via plus button at right corner." :
+              MSGS.employee_add_form :
+              data.length === 0 ? MSGS.route_the_form :
                 data.map((employee) =>
                   employee.records.map((record, recordIndex) => (
                     <tr key={recordIndex}>
                       {recordIndex === 0 && (
-                        <td rowSpan={employee.records.length}>{employee.name}</td>
+                        <td className="no-color" rowSpan={employee.records.length}>{employee.name}</td>
                       )}
                       <td>{record.date}</td>
                       <td>{PriceFormat(record.income)}</td>
@@ -177,20 +181,42 @@ function App() {
 
       <br />
       <hr />
-      <h4>Total Income: test</h4>
+      <h4>Total Income: {PriceFormat(totalIncome)}</h4>
 
       <br />
 
       <details>
-        <summary>Salaries ({PERCENT}%)</summary>
+        <summary>Salaries ({DEFAULT_PERCENT}%)</summary>
+
+
         <ul>
-          <ol>Test</ol>
+          {
+            data.length === 0 ? MSGS.route_the_form :
+              data.map((employee, index) => {
+                const totalSalary = employee.records.reduce((sum, record) => sum += record.income * DEFAULT_PERCENT / 100, 0);
+                const expenses = employee.records.reduce((sum, record) => sum += record.expense, 0)
+                return (
+                  <ol key={index}>{employee.name}: {PriceFormat(totalSalary - expenses)}</ol>
+                )
+              })
+          }
         </ul>
       </details>
 
       <br />
       <hr />
-      <h4>Net Income: test</h4>
+      <h4>Net Income:
+        {
+          data.length === 0 ? MSGS.route_the_form :
+            data.map((employee, index) => {
+              const totalSalary = employee.records.reduce((sum, record) => sum += record.income * DEFAULT_PERCENT / 100, 0);
+              const expenses = employee.records.reduce((sum, record) => sum += record.expense, 0)
+              const netPrices = totalIncome - (totalSalary - expenses)
+
+              return console.log(netPrices);
+            })
+        }
+      </h4>
     </main >
   );
 }
