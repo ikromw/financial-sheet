@@ -5,6 +5,9 @@ import { test_data, users, SET_INCOME_DATA, GET_INCOME_DATA } from "./db/db";
 import { PriceFormat, calculateTotalIncomes, calculateEmployeeSalaries, calculateTotalExpenses, calculateNetIncome } from "./lib/utils";
 import { useState, useMemo, useEffect } from "react";
 import { MSGS, DEFAULT_PERCENT } from "./lib/settings";
+// Third Party
+import dayjs from "dayjs";
+
 
 function App() {
   const [usersData, setUsersData] = useState(users)
@@ -25,6 +28,7 @@ function App() {
   // Handle users form component
   const handleFormSubmit = (formData) => {
     setUsersData([...usersData, formData]);
+    setUserDataForm(false)
   }
 
   // Handle main income data
@@ -166,7 +170,7 @@ function App() {
                       {recordIndex === 0 && (
                         <td className="no-color" rowSpan={employee.records.length}>{employee.name}</td>
                       )}
-                      <td>{record.date}</td>
+                      <td>{dayjs(record.date).format('MMMM D, YYYY')}</td>
                       <td>{record.income && PriceFormat(record.income)}</td>
                       <td>{record.expense && PriceFormat(record.expense)}</td>
                       <td>{record.income && PriceFormat(record.income - record.expense)}</td>
