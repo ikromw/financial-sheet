@@ -1,19 +1,24 @@
 import "./App.css";
+import dayjs from "dayjs";
 import UsersForm from "./components/UsersForm";
 import IncomeForm from "./components/IncomeForm";
-import { test_data, users, SET_INCOME_DATA, GET_INCOME_DATA } from "./db/db";
-import { PriceFormat, calculateTotalIncomes, calculateEmployeeSalaries, calculateTotalExpenses, calculateNetIncome } from "./lib/utils";
-import { useState, useMemo, useEffect } from "react";
+import { test_data, users } from "./db/db";
+import { useState, useMemo } from "react";
 import { MSGS, DEFAULT_PERCENT } from "./lib/settings";
-// Third Party
-import dayjs from "dayjs";
+import {
+  PriceFormat,
+  calculateTotalIncomes,
+  calculateEmployeeSalaries,
+  calculateTotalExpenses,
+  calculateNetIncome
+} from "./lib/utils";
 
 
 function App() {
   const [usersData, setUsersData] = useState(users)
   const [userDataForm, setUserDataForm] = useState(false)
 
-  const [data, setData] = useState([])
+  const [data, setData] = useState(test_data)
 
   const [dataForm, setDataForm] = useState(false)
   const [dataFormSchema, setDataFormSchema] = useState(
@@ -180,6 +185,123 @@ function App() {
           }
         </tbody>
       </table>
+
+      {/* <table className="table incomes">
+        <thead>
+          <tr>
+            <th><button>⬅️</button> December <button>▶️</button></th>
+            <th>Farhod</th>
+            <th>Samandar</th>
+            <th>Baxtiyor</th>
+            <th>Bekzod</th>
+            <th>Asil</th>
+            <th>Javohir</th>
+            <th>Saidahror</th>
+            <th>Muhriddin</th>
+            <th>BEKO</th>
+            <th>Ikrom</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>1</th>
+            <td>200,000 <br /> 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+          </tr>
+          <tr>
+            <th>1</th>
+            <td>200,000 <br /> 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+          </tr>
+          <tr>
+            <th>1</th>
+            <td>200,000 <br /> 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+          </tr>
+          <tr>
+            <th>1</th>
+            <td>200,000 <br /> 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+          </tr>
+          <tr>
+            <th>1</th>
+            <td>200,000 <br /> 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+          </tr>
+          <tr>
+            <th>1</th>
+            <td>200,000 <br /> 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+            <td>200,000 | 500 000</td>
+          </tr>
+        </tbody>
+      </table> */}
+
+      {/* {
+        usersData.length == 0 ?
+          MSGS.employee_add_form :
+          data.length === 0 ? MSGS.no_income :
+            data.map((employee) =>
+              employee.records.map((record, recordIndex) => (
+                <div key={recordIndex}>
+                  {recordIndex === 0 && (
+                    <h1>{employee.name}</h1>
+                  )}
+                  <p>{dayjs(record.date).format('MMMM D, YYYY')}</p>
+                  <p>{record.income && PriceFormat(record.income)}</p>
+                  <p>{record.expense && PriceFormat(record.expense)}</p>
+                  <p>{record.income && PriceFormat(record.income - record.expense)}</p>
+                </div>
+              ))
+            )
+      } */}
 
       <br />
       <hr />

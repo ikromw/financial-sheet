@@ -15,7 +15,7 @@ table thead {
 }
 
 table tbody tr:nth-child(even) {
-    background: #ccc;
+    background: #e6e6e6;
 }
 
 .employees-section {
