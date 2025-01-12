@@ -3,6 +3,11 @@ export const PriceFormat = (number) => {
     return number.toLocaleString()
 }
 
+// Plurals
+export const Plurals = (data, text) => {
+    return data.length > 1 ? text + "s: " : text + ": "
+}
+
 // Total incomes
 export const calculateTotalIncomes = (data) => {
     if (data.length === 0) {
@@ -61,6 +66,7 @@ export const calculateNetIncome = (data, DEFAULT_PERCENT) => {
     }
 
     let totalSalaries = data.map((employee) => employee.records.reduce((sum, record) => sum + record.income * (DEFAULT_PERCENT / 100), 0))
-    
+
     return totalSalaries.reduce((sum, record) => sum + record);
 }
+

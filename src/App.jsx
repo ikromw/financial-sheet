@@ -7,6 +7,7 @@ import { useState, useMemo } from "react";
 import { MSGS, DEFAULT_PERCENT } from "./lib/settings";
 import {
   PriceFormat,
+  Plurals,
   calculateTotalIncomes,
   calculateEmployeeSalaries,
   calculateTotalExpenses,
@@ -93,7 +94,8 @@ function App() {
     <main>
 
       <h2>
-        {managers.length < 2 ? "Manager: " : "Managers: "}
+        {Plurals(managers, "Manager")}
+
         {managers.length > 0 ? (
           managers.map((manager, index) => (
             <span key={index}> {manager.name}{index < managers.length - 1 ? ", " : ""}</span>
@@ -105,10 +107,10 @@ function App() {
       <hr />
       <br />
 
-      <div className="employees-section">
-        {usersData.length < 2 ? <h2>Employee</h2> : <h2>Employees</h2>}
+      <div className="employees-section align">
+        <h2>{Plurals(usersData, "Employee")}</h2>
 
-        <button onClick={() => setUserDataForm(!userDataForm)}>
+        <button className="open-close-form" onClick={() => setUserDataForm(!userDataForm)}>
           {userDataForm ? "-" : "+"}
         </button>
       </div>
@@ -130,6 +132,21 @@ function App() {
       <br />
       <br />
 
+
+      <div className="income-section align">
+        <h2>Incomes:</h2>
+
+        {
+          usersData.length > 0 ?
+            <button className="open-close-form" onClick={() => setDataForm(!dataForm)}>
+              {dataForm ? "-" : "+"}
+            </button>
+            :
+            null
+        }
+
+      </div>
+
       {dataForm && (
         <IncomeForm
           usersData={usersData}
@@ -138,21 +155,7 @@ function App() {
           setDataFormSchema={setDataFormSchema}
         />
       )}
-
-
-      <div className="income-section">
-        <p className="table--title-incomes">Incomes</p>
-
-        {
-          usersData.length > 0 ?
-            <button onClick={() => setDataForm(!dataForm)}>
-              {dataForm ? "-" : "+"}
-            </button>
-            :
-            null
-        }
-
-      </div>
+      <br />
 
       <table className="table incomes">
         <thead>
@@ -292,7 +295,7 @@ function App() {
               employee.records.map((record, recordIndex) => (
                 <div key={recordIndex}>
                   {recordIndex === 0 && (
-                    <h1>{employee.name}</h1>
+                    <h3>{employee.name}</h3>
                   )}
                   <p>{dayjs(record.date).format('MMMM D, YYYY')}</p>
                   <p>{record.income && PriceFormat(record.income)}</p>

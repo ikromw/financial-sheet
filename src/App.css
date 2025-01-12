@@ -5,65 +5,33 @@
 table {
     width: 100%;
 }
-
-table thead {
-    background: #ccc;
-}
-.no-color{
-    position: relative;
-    background: #ccc !important;
+table thead{
+    background: #ddd;
 }
 
-table tbody tr:nth-child(even) {
-    background: #e6e6e6;
-}
 
-.employees-section {
+/* 
+    BUTTON and FORM
+*/
+.align{
     display: flex;
-    align-items: center;
     gap: 10px;
+    align-items: center;
 }
-
-.employees-section:hover button {
-    display: flex;
+.align:hover .open-close-form{
+    display: block;
 }
-
-.employees-section button {
+.open-close-form{
+    width: 25px;
+    height: 25px;
     display: none;
     background: #ddd;
     border: none;
     cursor: pointer;
-    width: 25px;
-    height: 25px;
-    align-items: center;
-    justify-content: center;
 }
-
-.employees-section button:hover {
+.open-close-form:hover{
     background: #ccc;
 }
-
-.employees-section button:active {
-    background: #ddd;
-}
-
-
-.income-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-
-    background: #6cc76c;
-}
-
-.income-section button {
-    display: flex;
-    background: #4e9c4e;
-    border: none;
-    cursor: pointer;
-    width: 25px;
-    height: 25px;
-    align-items: center;
-    justify-content: center;
+.open-close-form:active{
+    transform: scale(.9);
 }
