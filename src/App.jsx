@@ -2,7 +2,7 @@ import "./App.css";
 import dayjs from "dayjs";
 import UsersForm from "./components/UsersForm";
 import IncomeForm from "./components/IncomeForm";
-import { test_data, users } from "./db/db";
+import { test_data, users, test_data1 } from "./db/db";
 import { useState, useMemo } from "react";
 import { MSGS, DEFAULT_PERCENT } from "./lib/settings";
 import {
@@ -157,7 +157,7 @@ function App() {
       )}
       <br />
 
-      <table className="table incomes">
+      {/* <table className="table incomes">
         <thead>
           <tr>
             <th>Name</th>
@@ -187,124 +187,68 @@ function App() {
                 )
           }
         </tbody>
+      </table> */}
+
+      <table className="table incomes">
+        <thead>
+          <tr>
+            <th><button>⬅️</button> Dec <button>▶️</button></th>
+            {test_data1.map((user) =>
+              <>
+                <th key={user.id}>{user.name}</th>
+              </>
+            )}
+          </tr>
+        </thead>
+
+        <tbody>
+          {
+            test_data1.map((user) =>
+              user.records.map((record, index) =>
+                console.log(record[0])
+              ))
+          }
+        </tbody>
       </table>
+
+
+
 
       {/* <table className="table incomes">
         <thead>
           <tr>
-            <th><button>⬅️</button> December <button>▶️</button></th>
+            <th><button>⬅️</button> Dec <button>▶️</button></th>
             <th>Farhod</th>
             <th>Samandar</th>
             <th>Baxtiyor</th>
             <th>Bekzod</th>
             <th>Asil</th>
             <th>Javohir</th>
-            <th>Saidahror</th>
-            <th>Muhriddin</th>
-            <th>BEKO</th>
-            <th>Ikrom</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <th>1</th>
-            <td>200,000 <br /> 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
+            <td>200,000/<span style={{ color: "#999" }}>10,000</span></td>
+            <td>0</td>
+            <td>200,000</td>
+            <td>200,000</td>
+            <td>200,000</td>
+            <td>200,000</td>
           </tr>
-          <tr>
-            <th>1</th>
-            <td>200,000 <br /> 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
+          
+          <tr className="expences">
+            <th>Expences</th>
+            <td>200,000</td>
+            <td>10</td>
+            <td>200,000</td>
+            <td>200,000</td>
+            <td>200,000</td>
+            <td>200,000</td>
           </tr>
-          <tr>
-            <th>1</th>
-            <td>200,000 <br /> 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-          </tr>
-          <tr>
-            <th>1</th>
-            <td>200,000 <br /> 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-          </tr>
-          <tr>
-            <th>1</th>
-            <td>200,000 <br /> 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-          </tr>
-          <tr>
-            <th>1</th>
-            <td>200,000 <br /> 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-            <td>200,000 | 500 000</td>
-          </tr>
+
         </tbody>
       </table> */}
-
-      {/* {
-        usersData.length == 0 ?
-          MSGS.employee_add_form :
-          data.length === 0 ? MSGS.no_income :
-            data.map((employee) =>
-              employee.records.map((record, recordIndex) => (
-                <div key={recordIndex}>
-                  {recordIndex === 0 && (
-                    <h3>{employee.name}</h3>
-                  )}
-                  <p>{dayjs(record.date).format('MMMM D, YYYY')}</p>
-                  <p>{record.income && PriceFormat(record.income)}</p>
-                  <p>{record.expense && PriceFormat(record.expense)}</p>
-                  <p>{record.income && PriceFormat(record.income - record.expense)}</p>
-                </div>
-              ))
-            )
-      } */}
 
       <br />
       <hr />

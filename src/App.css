@@ -1,27 +1,46 @@
 .manager {
     color: #15762e;
 }
-
+.expences{
+    background: lightcoral;
+}
 table {
     width: 100%;
-}
-table thead{
-    background: #ddd;
+    border: 1px solid #ddd;
 }
 
+table thead {
+    background: #ccc;
+}
+
+table thead tr th:nth-child(1) {
+    background: #ddd;
+    max-width: 40px !important;
+}
+table thead tr th:nth-child(1) button{
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+table tbody tr:nth-child(even) {
+    background: #ddd;
+}
 
 /* 
     BUTTON and FORM
 */
-.align{
+.align {
     display: flex;
     gap: 10px;
     align-items: center;
 }
-.align:hover .open-close-form{
+
+.align:hover .open-close-form {
     display: block;
 }
-.open-close-form{
+
+.open-close-form {
     width: 25px;
     height: 25px;
     display: none;
@@ -29,9 +48,11 @@ table thead{
     border: none;
     cursor: pointer;
 }
-.open-close-form:hover{
+
+.open-close-form:hover {
     background: #ccc;
 }
-.open-close-form:active{
+
+.open-close-form:active {
     transform: scale(.9);
 }

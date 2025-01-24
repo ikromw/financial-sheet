@@ -20,6 +20,8 @@ const IncomeForm = ({ usersData, onSubmit, dataFormSchema, setDataFormSchema }) 
                 </>
             </select>
 
+            <input type="date" name="" id="" />
+
             <input
                 type="number"
                 name="income"
