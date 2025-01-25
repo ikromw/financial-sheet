@@ -57,6 +57,35 @@ export const calculateEmployeeSalary = (employee, DEFAULT_PERCENT) => {
     return totalSalary - expenses;
 };
 
+// Employee total income
+export const calculateEmployeeTotalIncome = (employee) => {
+    if (employee.length === 0) {
+        return console.log("Employee total income data length = 0");
+    }
+
+    let totalIncome = 0;
+    for (const record of employee.records) {
+        totalIncome += record.income;
+    }
+
+    return totalIncome;
+};
+
+// Employee total expense
+export const calculateEmployeeTotalExpense = (employee) => {
+    if (employee.length === 0) {
+        return console.log("Employee total expenses data length = 0");
+    }
+
+    let totalExpense = 0;
+    for (const record of employee.records) {
+        totalExpense += record.expense;
+    }
+
+    return totalExpense;
+};
+
+
 // Net income
 export const calculateNetIncome = (data, DEFAULT_PERCENT) => {
     if (data.length === 0) {

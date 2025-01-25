@@ -12,6 +12,8 @@ import {
   calculateTotalIncomes,
   calculateEmployeeSalary,
   calculateTotalExpenses,
+  calculateEmployeeTotalIncome,
+  calculateEmployeeTotalExpense,
   calculateNetIncome
 } from "./lib/utils";
 
@@ -167,24 +169,35 @@ function App() {
               {PriceFormat(calculateEmployeeSalary(employee, DEFAULT_PERCENT))}
             </summary>
 
-            <table>
+            <table className="employee-records__table">
               <thead>
                 <tr>
-                  <td>Dates</td>
-                  <td>Incomes</td>
-                  <td>Expenses</td>
+                  <td className="date-table__header">Dates</td>
+                  <td className="income-table__header">Incomes</td>
+                  <td className="expense-table__header">Expenses</td>
                 </tr>
               </thead>
               <tbody>
                 {
                   employee.records.map((record) => (
                     <tr key={uuid()}>
-                      <td>{dayjs(record.date).format('MMMM D, YYYY')}</td>
-                      <td>{record.income && PriceFormat(record.income)}</td>
-                      <td>{record.expense && PriceFormat(record.expense)}</td>
+                      <td className="date-table__body">{dayjs(record.date).format('MMMM D, YYYY')}</td>
+                      <td className="income-table__body">{record.income && PriceFormat(record.income)}</td>
+                      <td className="expense-table__body">{record.expense && PriceFormat(record.expense)}</td>
                     </tr>
                   ))
                 }
+                {
+                  employee.records.length > 1 ?
+                    <tr>
+                      <td></td>
+                      <td className="income-table__total">{PriceFormat(calculateEmployeeTotalIncome(employee))}</td>
+                      <td className="expense-table__total">{PriceFormat(calculateEmployeeTotalExpense(employee))}</td>
+                    </tr>
+                    :
+                    null
+                }
+
               </tbody>
             </table>
           </details>

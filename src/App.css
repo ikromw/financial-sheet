@@ -1,9 +1,36 @@
 .manager {
     color: #15762e;
 }
-table,
-.table{
+
+.employee-records__table {
     width: 100%;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+.employee-records__table tbody tr:nth-child(even) {
+    background: #dddddd56;
+}
+
+.employee-records__table .income-table__header {
+    color: #15762e;
+}
+
+.employee-records__table .income-table__total {
+    background: #b7d3be;
+    color: #15762e;
+}
+
+.employee-records__table .expense-table__header {
+    color: #a23636;
+}
+.employee-records__table .expense-table__total {
+    color: #a23636;
+    background: #d3b7b7;
+}
+
+.employee-records__table .date-table__body {
+    opacity: 0.5;
 }
 
 /* 
@@ -34,4 +61,13 @@ table,
 
 .open-close-form:active {
     transform: scale(.9);
+}
+
+
+details summary {
+    cursor: pointer;
+}
+
+details summary:hover {
+    background: #dddddd56;
 }
