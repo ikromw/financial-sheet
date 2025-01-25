@@ -1,15 +1,16 @@
 import "./App.css";
 import dayjs from "dayjs";
+import uuid from 'react-uuid';
 import UsersForm from "./components/UsersForm";
 import IncomeForm from "./components/IncomeForm";
-import { test_data, users, test_data1 } from "./db/db";
+import { test_data, users } from "./db";
 import { useState, useMemo } from "react";
 import { MSGS, DEFAULT_PERCENT } from "./lib/settings";
 import {
   PriceFormat,
   Plurals,
   calculateTotalIncomes,
-  calculateEmployeeSalaries,
+  calculateEmployeeSalary,
   calculateTotalExpenses,
   calculateNetIncome
 } from "./lib/utils";
@@ -24,6 +25,7 @@ function App() {
   const [dataForm, setDataForm] = useState(false)
   const [dataFormSchema, setDataFormSchema] = useState(
     {
+      id: uuid(),
       name: "",
       date: new Date().toLocaleDateString(),
       income: 0,
@@ -81,7 +83,6 @@ function App() {
   }
 
   // Utills
-  const salaries = calculateEmployeeSalaries(data, DEFAULT_PERCENT);
   const totalIncomes = useMemo(() => calculateTotalIncomes(data), [data]);
   const totalExpenses = useMemo(() => calculateTotalExpenses(data), [data]);
   const netIncome = useMemo(() => calculateNetIncome(data, DEFAULT_PERCENT), [data])
@@ -134,7 +135,7 @@ function App() {
 
 
       <div className="income-section align">
-        <h2>Incomes:</h2>
+        <h2>Incomes:</h2> ({DEFAULT_PERCENT}%)
 
         {
           usersData.length > 0 ?
@@ -157,98 +158,42 @@ function App() {
       )}
       <br />
 
-      {/* <table className="table incomes">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Income</th>
-            <th>Expense</th>
-            <th>Net Balance</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            usersData.length == 0 ?
-              MSGS.employee_add_form :
-              data.length === 0 ? MSGS.no_income :
-                data.map((employee) =>
-                  employee.records.map((record, recordIndex) => (
-                    <tr key={recordIndex}>
-                      {recordIndex === 0 && (
-                        <td className="no-color" rowSpan={employee.records.length}>{employee.name}</td>
-                      )}
+
+      {data.map((employee) => (
+        <>
+          <details>
+            <summary key={employee.id}>
+              {employee.name}:&nbsp;
+              {PriceFormat(calculateEmployeeSalary(employee, DEFAULT_PERCENT))}
+            </summary>
+
+            <table>
+              <thead>
+                <tr>
+                  <td>Dates</td>
+                  <td>Incomes</td>
+                  <td>Expenses</td>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  employee.records.map((record) => (
+                    <tr key={uuid()}>
                       <td>{dayjs(record.date).format('MMMM D, YYYY')}</td>
                       <td>{record.income && PriceFormat(record.income)}</td>
                       <td>{record.expense && PriceFormat(record.expense)}</td>
-                      <td>{record.income && PriceFormat(record.income - record.expense)}</td>
                     </tr>
                   ))
-                )
-          }
-        </tbody>
-      </table> */}
+                }
+              </tbody>
+            </table>
+          </details>
 
-      <table className="table incomes">
-        <thead>
-          <tr>
-            <th><button>⬅️</button> Dec <button>▶️</button></th>
-            {test_data1.map((user) =>
-              <>
-                <th key={user.id}>{user.name}</th>
-              </>
-            )}
-          </tr>
-        </thead>
+        </>
 
-        <tbody>
-          {
-            test_data1.map((user) =>
-              user.records.map((record, index) =>
-                console.log(record[0])
-              ))
-          }
-        </tbody>
-      </table>
+      ))}
 
 
-
-
-      {/* <table className="table incomes">
-        <thead>
-          <tr>
-            <th><button>⬅️</button> Dec <button>▶️</button></th>
-            <th>Farhod</th>
-            <th>Samandar</th>
-            <th>Baxtiyor</th>
-            <th>Bekzod</th>
-            <th>Asil</th>
-            <th>Javohir</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th>1</th>
-            <td>200,000/<span style={{ color: "#999" }}>10,000</span></td>
-            <td>0</td>
-            <td>200,000</td>
-            <td>200,000</td>
-            <td>200,000</td>
-            <td>200,000</td>
-          </tr>
-          
-          <tr className="expences">
-            <th>Expences</th>
-            <td>200,000</td>
-            <td>10</td>
-            <td>200,000</td>
-            <td>200,000</td>
-            <td>200,000</td>
-            <td>200,000</td>
-          </tr>
-
-        </tbody>
-      </table> */}
 
       <br />
       <hr />
@@ -256,26 +201,9 @@ function App() {
       <h4>Total Expense: {totalExpenses && PriceFormat(totalExpenses)}</h4>
 
       <br />
-
-      <details>
-        <summary>Salaries ({DEFAULT_PERCENT}%)</summary>
-        <ul>
-          {
-            salaries.length > 0 ?
-              salaries.map(employee =>
-                <ol key={employee.name}>{employee.name}: {PriceFormat(employee.netSalary)}</ol>
-              )
-              :
-              MSGS.no_income
-          }
-        </ul>
-      </details>
-
-
-      <br />
       <hr />
       <h4>Net Income: {totalIncomes && PriceFormat(totalIncomes - netIncome)}</h4>
-    </main >
+    </main>
   );
 }
 

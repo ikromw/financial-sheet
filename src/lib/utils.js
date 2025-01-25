@@ -36,27 +36,25 @@ export const calculateTotalExpenses = (data) => {
 };
 
 // Employee's salary
-export const calculateEmployeeSalaries = (data, DEFAULT_PERCENT) => {
-    if (data.length === 0) {
-        return [];
+export const calculateEmployeeSalary = (employee, DEFAULT_PERCENT) => {
+    if (employee.length === 0) {
+        return 0;
     }
+    console.log("Data from employee", employee);
 
-    return data.map((employee) => {
-        const totalSalary = employee.records.reduce(
-            (sum, record) => sum + record.income * (DEFAULT_PERCENT / 100),
-            0
-        );
-        const expenses = employee.records.reduce(
-            (sum, record) => sum + record.expense,
-            0
-        );
-        const netSalary = totalSalary - expenses;
+    const totalSalary = employee.records.reduce(
+        (sum, record) => sum + record.income * (DEFAULT_PERCENT / 100),
+        0
+    );
+    console.log("I counted total salary with percent", totalSalary);
 
-        return {
-            name: employee.name,
-            netSalary: netSalary,
-        };
-    });
+    const expenses = employee.records.reduce(
+        (sum, record) => sum + record.expense,
+        0
+    );
+    console.log("I counted expenses", expenses);
+
+    return totalSalary - expenses;
 };
 
 // Net income
