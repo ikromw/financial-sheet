@@ -24,6 +24,7 @@
 .employee-records__table .expense-table__header {
     color: #a23636;
 }
+
 .employee-records__table .expense-table__total {
     color: #a23636;
     background: #d3b7b7;
@@ -33,8 +34,10 @@
     opacity: 0.5;
 }
 
-/* 
-    BUTTON and FORM
+/*
+=================
+===== FORM ======
+=================
 */
 .align {
     display: flex;
@@ -43,25 +46,13 @@
 }
 
 .align:hover .open-close-form {
-    display: block;
+    opacity: 1;
 }
 
-.open-close-form {
-    width: 25px;
-    height: 25px;
-    display: none;
-    background: #ddd;
-    border: none;
-    cursor: pointer;
-}
 
-.open-close-form:hover {
-    background: #ccc;
-}
 
-.open-close-form:active {
-    transform: scale(.9);
-}
+
+
 
 
 details summary {
@@ -70,4 +61,41 @@ details summary {
 
 details summary:hover {
     background: #dddddd56;
+}
+
+.income-section {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+
+
+
+
+
+
+
+
+/*
+===================
+===== BUTTON ======
+===================
+*/
+.open-close-form {
+    width: 25px;
+    height: 25px;
+    display: none;
+    background: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+}
+
+.open-close-form:active {
+    transform: scale(.9);
 }

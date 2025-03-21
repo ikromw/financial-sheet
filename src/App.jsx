@@ -1,11 +1,22 @@
 import "./App.css";
 import dayjs from "dayjs";
 import uuid from 'react-uuid';
+import { utils, writeFile } from 'xlsx';
 import UsersForm from "./components/UsersForm";
 import IncomeForm from "./components/IncomeForm";
-import { test_data, users } from "./db";
-import { useState, useMemo } from "react";
+import { dataDB } from "./db";
+import { useState, useMemo, useCallback } from "react";
 import { MSGS, DEFAULT_PERCENT } from "./lib/settings";
+
+import IconButton from "./components/IconButton";
+
+import {
+  SquarePlus,
+  SquareMinus,
+  SquareArrowLeft,
+  SquareArrowRight
+} from 'lucide-react';
+
 import {
   PriceFormat,
   Plurals,
@@ -19,10 +30,10 @@ import {
 
 
 function App() {
-  const [usersData, setUsersData] = useState(users)
+  const [usersData, setUsersData] = useState(dataDB)
   const [userDataForm, setUserDataForm] = useState(false)
 
-  const [data, setData] = useState(test_data)
+  const [data, setData] = useState(dataDB)
 
   const [dataForm, setDataForm] = useState(false)
   const [dataFormSchema, setDataFormSchema] = useState(
@@ -93,9 +104,32 @@ function App() {
   const managers = usersData.filter((manager) => manager.is_manager === true);
 
 
+  // Export to excell
+  const exportFile = useCallback(() => {
+
+    // Flatten data: add "Name" to each record
+    const flattenedData = data.flatMap((entry) =>
+      entry.records.map((record) => ({
+        Name: entry.name,
+        Date: record.date,
+        Income: record.income,
+        Expense: record.expense,
+      }))
+    );
+
+    /* Generate worksheet from flattened data */
+    const ws = utils.json_to_sheet(flattenedData);
+
+    /* Create workbook and append worksheet */
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, "Data");
+
+    /* Export to XLSX */
+    writeFile(wb, "data.xlsx");
+  }, []);
+
   return (
     <main>
-
       <h2>
         {Plurals(managers, "Manager")}
 
@@ -113,9 +147,12 @@ function App() {
       <div className="employees-section align">
         <h2>{Plurals(usersData, "Employee")}</h2>
 
-        <button className="open-close-form" onClick={() => setUserDataForm(!userDataForm)}>
-          {userDataForm ? "-" : "+"}
-        </button>
+        {userDataForm ?
+          <IconButton handleClick={() => setUserDataForm(!true)} icon={SquareMinus} />
+          :
+          <IconButton handleClick={() => setUserDataForm(true)} icon={SquarePlus} />
+        }
+
       </div>
 
       <br />
@@ -136,86 +173,106 @@ function App() {
       <br />
 
 
-      <div className="income-section align">
-        <h2>Incomes:</h2> ({DEFAULT_PERCENT}%)
+      <section>
 
-        {
-          usersData.length > 0 ?
-            <button className="open-close-form" onClick={() => setDataForm(!dataForm)}>
-              {dataForm ? "-" : "+"}
-            </button>
-            :
-            null
-        }
+        <div className="income-section align">
+          <div className="align">
+            <h2>Incomes:</h2> ({DEFAULT_PERCENT}%)
 
-      </div>
+            {
+              usersData.length > 0 ?
+                dataForm ?
+                  <IconButton handleClick={() => setDataForm(!true)} icon={SquareMinus} />
+                  :
+                  <IconButton handleClick={() => setDataForm(true)} icon={SquarePlus} />
+                : null
+            }
+          </div>
+          <div className="align">
+            <SquareArrowLeft />
+            {/* <IconButton handleClick={() => setDataForm(!true)} icon={SquareArrowLeft} /> */}
+            <p>January</p>
+            <SquareArrowRight />
+            
+            {/* <IconButton handleClick={() => setDataForm(!true)} icon={SquareArrowRight} /> */}
+          </div>
+        </div>
 
-      {dataForm && (
-        <IncomeForm
-          usersData={usersData}
-          onSubmit={handleIncomeFormSubmit}
-          dataFormSchema={dataFormSchema}
-          setDataFormSchema={setDataFormSchema}
-        />
-      )}
-      <br />
+        {dataForm && (
+          <IncomeForm
+            usersData={usersData}
+            onSubmit={handleIncomeFormSubmit}
+            dataFormSchema={dataFormSchema}
+            setDataFormSchema={setDataFormSchema}
+          />
+        )}
+
+        <br />
+
+        {data.map((employee) => (
+          <>
+            <details>
+              <summary key={employee.id}>
+                {employee.name}:&nbsp;
+                {PriceFormat(calculateEmployeeSalary(employee, DEFAULT_PERCENT))}
+              </summary>
+
+              <table className="employee-records__table">
+                <thead>
+                  <tr>
+                    <td className="date-table__header">Dates</td>
+                    <td className="income-table__header">Incomes</td>
+                    <td className="expense-table__header">Expenses</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    employee.records.map((record) => (
+                      <tr key={uuid()}>
+                        <td className="date-table__body">{dayjs(record.date).format('MMMM D, YYYY')}</td>
+                        <td className="income-table__body">{record.income && PriceFormat(record.income)}</td>
+                        <td className="expense-table__body">{record.expense && PriceFormat(record.expense)}</td>
+                      </tr>
+                    ))
+                  }
+                  {
+                    employee.records.length > 1 ?
+                      <tr>
+                        <td></td>
+                        <td className="income-table__total">{PriceFormat(calculateEmployeeTotalIncome(employee))}</td>
+                        <td className="expense-table__total">{PriceFormat(calculateEmployeeTotalExpense(employee))}</td>
+                      </tr>
+                      :
+                      null
+                  }
+
+                </tbody>
+              </table>
+            </details>
+
+          </>
+
+        ))}
+
+        <br />
+
+        <div className="">
+
+          <h4>
+            <span>Total Income: {totalIncomes && PriceFormat(totalIncomes)} </span>
+
+            <span>| Total Expense: {totalExpenses && PriceFormat(totalExpenses)}</span>
+          </h4>
+          <hr />
+          <br />
+          <h4>Net Income: {totalIncomes && PriceFormat(totalIncomes - netIncome)}</h4>
+
+        </div>
+
+      </section>
 
 
-      {data.map((employee) => (
-        <>
-          <details>
-            <summary key={employee.id}>
-              {employee.name}:&nbsp;
-              {PriceFormat(calculateEmployeeSalary(employee, DEFAULT_PERCENT))}
-            </summary>
-
-            <table className="employee-records__table">
-              <thead>
-                <tr>
-                  <td className="date-table__header">Dates</td>
-                  <td className="income-table__header">Incomes</td>
-                  <td className="expense-table__header">Expenses</td>
-                </tr>
-              </thead>
-              <tbody>
-                {
-                  employee.records.map((record) => (
-                    <tr key={uuid()}>
-                      <td className="date-table__body">{dayjs(record.date).format('MMMM D, YYYY')}</td>
-                      <td className="income-table__body">{record.income && PriceFormat(record.income)}</td>
-                      <td className="expense-table__body">{record.expense && PriceFormat(record.expense)}</td>
-                    </tr>
-                  ))
-                }
-                {
-                  employee.records.length > 1 ?
-                    <tr>
-                      <td></td>
-                      <td className="income-table__total">{PriceFormat(calculateEmployeeTotalIncome(employee))}</td>
-                      <td className="expense-table__total">{PriceFormat(calculateEmployeeTotalExpense(employee))}</td>
-                    </tr>
-                    :
-                    null
-                }
-
-              </tbody>
-            </table>
-          </details>
-
-        </>
-
-      ))}
-
-
-
-      <br />
-      <hr />
-      <h4>Total Income: {totalIncomes && PriceFormat(totalIncomes)}</h4>
-      <h4>Total Expense: {totalExpenses && PriceFormat(totalExpenses)}</h4>
-
-      <br />
-      <hr />
-      <h4>Net Income: {totalIncomes && PriceFormat(totalIncomes - netIncome)}</h4>
+      {/* <button onClick={() => exportFile()}>Export Data to Excel</button> */}
     </main>
   );
 }
