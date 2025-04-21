@@ -31,10 +31,9 @@ import {
 
 function App() {
   const [usersData, setUsersData] = useState(dataDB)
+  const [selectDate, setSelectDate] = useState(new Date())
   const [userDataForm, setUserDataForm] = useState(false)
-
   const [data, setData] = useState(dataDB)
-
   const [dataForm, setDataForm] = useState(false)
   const [dataFormSchema, setDataFormSchema] = useState(
     {
@@ -45,6 +44,15 @@ function App() {
       expense: 0
     }
   )
+
+  const selectNextMonth = () => {
+    let nextMonth = dayjs(selectDate).add(1, 'month').format('YYYY-MM-DD')
+    setSelectDate(nextMonth)
+  }
+  const selectPrevMonth = () => {
+    let nextMonth = dayjs(selectDate).add(-1, 'month').format('YYYY-MM-DD')
+    setSelectDate(nextMonth)
+  }
 
   // Handle users form component
   const handleFormSubmit = (formData) => {
@@ -57,7 +65,7 @@ function App() {
     e.preventDefault();
     console.log("Data Form Schema: ", dataFormSchema);
 
-    // Find the existing entry for the current name (if any)
+    
     const existingEntryIndex = data.findIndex((item) => item.name === dataFormSchema.name);
 
     if (existingEntryIndex !== -1) {
@@ -70,7 +78,7 @@ function App() {
       });
       setData(updatedData);
     } else {
-      // If no entry exists, create a new one
+      
       setData([
         ...data,
         {
@@ -102,31 +110,6 @@ function App() {
 
   // Seperated managers from employees
   const managers = usersData.filter((manager) => manager.is_manager === true);
-
-
-  // Export to excell
-  const exportFile = useCallback(() => {
-
-    // Flatten data: add "Name" to each record
-    const flattenedData = data.flatMap((entry) =>
-      entry.records.map((record) => ({
-        Name: entry.name,
-        Date: record.date,
-        Income: record.income,
-        Expense: record.expense,
-      }))
-    );
-
-    /* Generate worksheet from flattened data */
-    const ws = utils.json_to_sheet(flattenedData);
-
-    /* Create workbook and append worksheet */
-    const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, "Data");
-
-    /* Export to XLSX */
-    writeFile(wb, "data.xlsx");
-  }, []);
 
   return (
     <main>
@@ -188,13 +171,11 @@ function App() {
                 : null
             }
           </div>
+
           <div className="align">
-            <SquareArrowLeft />
-            {/* <IconButton handleClick={() => setDataForm(!true)} icon={SquareArrowLeft} /> */}
-            <p>January</p>
-            <SquareArrowRight />
-            
-            {/* <IconButton handleClick={() => setDataForm(!true)} icon={SquareArrowRight} /> */}
+            <IconButton handleClick={() => selectPrevMonth()} icon={SquareArrowLeft} />
+            <p className="selectedMonth">{dayjs(selectDate).format('MMMM')}</p>
+            <IconButton handleClick={() => selectNextMonth()} icon={SquareArrowRight} />
           </div>
         </div>
 

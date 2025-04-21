@@ -99,3 +99,14 @@ details summary:hover {
 .open-close-form:active {
     transform: scale(.9);
 }
+
+
+
+.selectedMonth{
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    padding: 0 10px;
+    border-radius: 5px;
+    min-width: 110px;
+    text-align: center;
+}
