@@ -102,11 +102,15 @@ details summary:hover {
 
 
 
-.selectedMonth{
+.selectedMonth {
     background: #f7f7f7;
     border: 1px solid #ddd;
     padding: 0 10px;
     border-radius: 5px;
     min-width: 110px;
     text-align: center;
+}
+
+.selectedMonth.active {
+    color: #D85818;
 }

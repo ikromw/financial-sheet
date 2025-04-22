@@ -1,7 +1,6 @@
 import "./App.css";
 import dayjs from "dayjs";
 import uuid from 'react-uuid';
-import { utils, writeFile } from 'xlsx';
 import UsersForm from "./components/UsersForm";
 import IncomeForm from "./components/IncomeForm";
 import { dataDB } from "./db";
@@ -44,14 +43,35 @@ function App() {
       expense: 0
     }
   )
-
+  
   const selectNextMonth = () => {
-    let nextMonth = dayjs(selectDate).add(1, 'month').format('YYYY-MM-DD')
-    setSelectDate(nextMonth)
+    const currentDate = dayjs(new Date()).format('YYYY-MM-DD');
+    const nextMonth = dayjs(selectDate).add(1, 'month').format('YYYY-MM-DD');
+    
+    // Don't proceed if trying to go beyond current month
+    if (dayjs(nextMonth).isAfter(currentDate, 'month')) {
+      return alert("You can't go beyond the current month.");
+    }
+    
+    setSelectDate(nextMonth);
+    const nextMonthData = dataDB.filter((item) => 
+      item.records.some((record) => 
+        dayjs(record.date).isSame(nextMonth, 'month')
+      )
+    );
+    setData(nextMonthData);
   }
+
   const selectPrevMonth = () => {
-    let nextMonth = dayjs(selectDate).add(-1, 'month').format('YYYY-MM-DD')
-    setSelectDate(nextMonth)
+    const prevMonth = dayjs(selectDate).subtract(1, 'month').format('YYYY-MM-DD');
+    setSelectDate(prevMonth);
+    
+    const prevMonthData = dataDB.filter((item) => 
+      item.records.some((record) => 
+        dayjs(record.date).isSame(prevMonth, 'month')
+      )
+    );
+    setData(prevMonthData);
   }
 
   // Handle users form component
@@ -174,7 +194,7 @@ function App() {
 
           <div className="align">
             <IconButton handleClick={() => selectPrevMonth()} icon={SquareArrowLeft} />
-            <p className="selectedMonth">{dayjs(selectDate).format('MMMM')}</p>
+            <p className={"selectedMonth" + " " +(selectDate == dayjs(new Date()).format('YYYY-MM-DD') ? "active" : null)}>{dayjs(selectDate).format('MMMM')}</p>
             <IconButton handleClick={() => selectNextMonth()} icon={SquareArrowRight} />
           </div>
         </div>
@@ -238,22 +258,20 @@ function App() {
         <br />
 
         <div className="">
-
           <h4>
-            <span>Total Income: {totalIncomes && PriceFormat(totalIncomes)} </span>
+            <span>Total Income:  {totalIncomes | totalIncomes && PriceFormat(totalIncomes)} </span>
 
-            <span>| Total Expense: {totalExpenses && PriceFormat(totalExpenses)}</span>
+            <span>| Total Expense: {totalExpenses | totalExpenses && PriceFormat(totalExpenses)}</span>
           </h4>
           <hr />
           <br />
-          <h4>Net Income: {totalIncomes && PriceFormat(totalIncomes - netIncome)}</h4>
+          <h4>Net Income: {(totalIncomes & netIncome) && PriceFormat(totalIncomes - netIncome)}</h4>
 
         </div>
 
       </section>
 
 
-      {/* <button onClick={() => exportFile()}>Export Data to Excel</button> */}
     </main>
   );
 }
