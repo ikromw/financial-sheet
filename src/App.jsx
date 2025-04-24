@@ -1,221 +1,184 @@
+import { useState, useMemo } from "react";
 import "./App.css";
+import "./form.css";
 import dayjs from "dayjs";
 import uuid from 'react-uuid';
-import UsersForm from "./components/UsersForm";
-import IncomeForm from "./components/IncomeForm";
 import { dataDB } from "./db";
-import { useState, useMemo, useCallback } from "react";
-import { MSGS, DEFAULT_PERCENT } from "./lib/settings";
+import { FINANCE_PERCENT } from "./lib/settings";
 
-import IconButton from "./components/IconButton";
+// ui
+import Button from "./components/Button";
 
+// icon
 import {
   SquarePlus,
-  SquareMinus,
   SquareArrowLeft,
-  SquareArrowRight
+  SquareArrowRight,
+  PanelRightClose
 } from 'lucide-react';
 
+// utils
 import {
-  PriceFormat,
   Plurals,
-  calculateTotalIncomes,
-  calculateEmployeeSalary,
-  calculateTotalExpenses,
-  calculateEmployeeTotalIncome,
-  calculateEmployeeTotalExpense,
-  calculateNetIncome
+  formatCost,
+  // finance
+  getTotalIncome,
+  getEmployeeTotalIncome,
+  getEmployeeTotalExpense,
+  // employee
+  getEmployeeSalary,
+  getTotalExpenses,
+  getNetIncome
 } from "./lib/utils";
+const FORM_CONTROL = 'closed' | 'userData' | 'recordData';
 
 
 function App() {
-  const [usersData, setUsersData] = useState(dataDB)
-  const [selectDate, setSelectDate] = useState(new Date())
-  const [userDataForm, setUserDataForm] = useState(false)
   const [data, setData] = useState(dataDB)
-  const [dataForm, setDataForm] = useState(false)
-  const [dataFormSchema, setDataFormSchema] = useState(
-    {
-      id: uuid(),
-      name: "",
-      date: new Date().toLocaleDateString(),
-      income: 0,
-      expense: 0
-    }
-  )
-  
-  const selectNextMonth = () => {
-    const currentDate = dayjs(new Date()).format('YYYY-MM-DD');
-    const nextMonth = dayjs(selectDate).add(1, 'month').format('YYYY-MM-DD');
-    
-    // Don't proceed if trying to go beyond current month
-    if (dayjs(nextMonth).isAfter(currentDate, 'month')) {
-      return alert("You can't go beyond the current month.");
-    }
-    
-    setSelectDate(nextMonth);
-    const nextMonthData = dataDB.filter((item) => 
-      item.records.some((record) => 
-        dayjs(record.date).isSame(nextMonth, 'month')
-      )
-    );
-    setData(nextMonthData);
-  }
+  const [openForm, setOpenForm] = useState("closed")
+  // Form
+  const [userData, setUserData] = useState({
+    id: uuid(),
+    name: "",
+    role: "employee",
+    records: []
+  });
+  const [recordData, setRecordData] = useState({
+    date: dayjs().format("YYYY-MM-DD"),
+    income: 0,
+    expense: 0,
+    work: ""
+  });
+  // Month filter
+  const [selectedMonth, setSelectedMonth] = useState(dayjs().month());
+  const [selectedYear, setSelectedYear] = useState(dayjs().year());
 
   const selectPrevMonth = () => {
-    const prevMonth = dayjs(selectDate).subtract(1, 'month').format('YYYY-MM-DD');
-    setSelectDate(prevMonth);
-    
-    const prevMonthData = dataDB.filter((item) => 
-      item.records.some((record) => 
-        dayjs(record.date).isSame(prevMonth, 'month')
-      )
-    );
-    setData(prevMonthData);
-  }
-
-  // Handle users form component
-  const handleFormSubmit = (formData) => {
-    setUsersData([...usersData, formData]);
-    setUserDataForm(false)
-  }
-
-  // Handle main income data
-  const handleIncomeFormSubmit = (e) => {
-    e.preventDefault();
-    console.log("Data Form Schema: ", dataFormSchema);
-
-    
-    const existingEntryIndex = data.findIndex((item) => item.name === dataFormSchema.name);
-
-    if (existingEntryIndex !== -1) {
-      // If an entry exists, update its records
-      const updatedData = [...data];
-      updatedData[existingEntryIndex].records.push({
-        date: dataFormSchema.date,
-        income: parseFloat(dataFormSchema.income), // Parse income as a number
-        expense: parseFloat(dataFormSchema.expense), // Parse expense as a number
-      });
-      setData(updatedData);
+    if (selectedMonth === 0) {
+      setSelectedMonth(11);
+      setSelectedYear(selectedYear - 1);
     } else {
-      
-      setData([
-        ...data,
-        {
-          name: dataFormSchema.name,
-          records: [
-            {
-              date: dataFormSchema.date,
-              income: parseFloat(dataFormSchema.income), // Parse income as a number
-              expense: parseFloat(dataFormSchema.expense), // Parse expense as a number
-            },
-          ],
-        },
-      ]);
+      setSelectedMonth(selectedMonth - 1);
     }
+  };
 
-    setDataFormSchema({
-      name: "",
-      date: new Date().toLocaleDateString(),
-      income: 0,
-      expense: 0
-    })
-    setDataForm(false)
+  const selectNextMonth = () => {
+    if (selectedMonth === 11) {
+      setSelectedMonth(0);
+      setSelectedYear(selectedYear + 1);
+    } else {
+      setSelectedMonth(selectedMonth + 1);
+    }
+  };
+
+  // Filtered data by month
+  const filteredData = useMemo(() => {
+    return data.map(employee => ({
+      ...employee,
+      records: employee.records.filter(record => {
+        const d = dayjs(record.date);
+        return d.month() === selectedMonth && d.year() === selectedYear;
+      })
+    }));
+  }, [data, selectedMonth, selectedYear]);
+
+  // Form handlers
+  const setUserDataForm = (e) => {
+    const { name, value } = e.target;
+
+    setUserData({
+      ...data,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // Utils
+  const totalIncomes = useMemo(() => getTotalIncome(filteredData), [filteredData]);
+  const totalExpenses = useMemo(() => getTotalExpenses(filteredData), [filteredData]);
+  const netIncome = useMemo(() => getNetIncome(filteredData, FINANCE_PERCENT), [filteredData])
+
+  // Managers
+  const managers = data.filter((manager) => manager.role === "manager");
+
+  // Find oldest and newest record dates
+  const allRecords = data.flatMap(emp => emp.records);
+  const oldestRecord = allRecords.length ? allRecords.reduce((min, rec) => dayjs(rec.date).isBefore(min) ? dayjs(rec.date) : min, dayjs(allRecords[0].date)) : null;
+  const newestRecord = allRecords.length ? allRecords.reduce((max, rec) => dayjs(rec.date).isAfter(max) ? dayjs(rec.date) : max, dayjs(allRecords[0].date)) : null;
+
+  const isPrevDisabled = oldestRecord ? (selectedMonth === oldestRecord.month() && selectedYear === oldestRecord.year()) : true;
+  const isNextDisabled = newestRecord ? (selectedMonth === newestRecord.month() && selectedYear === newestRecord.year()) : true;
+
+  if (data.length === 0) {
+    return (
+      <div className="app">
+        <h2>No data</h2>
+        <Button handleClick={() => setOpenForm(true)} icon={SquarePlus} />
+      </div>
+    );
   }
-
-  // Utills
-  const totalIncomes = useMemo(() => calculateTotalIncomes(data), [data]);
-  const totalExpenses = useMemo(() => calculateTotalExpenses(data), [data]);
-  const netIncome = useMemo(() => calculateNetIncome(data, DEFAULT_PERCENT), [data])
-
-  // Seperated managers from employees
-  const managers = usersData.filter((manager) => manager.is_manager === true);
 
   return (
     <main>
-      <h2>
-        {Plurals(managers, "Manager")}
 
-        {managers.length > 0 ? (
-          managers.map((manager, index) => (
-            <span key={index}> {manager.name}{index < managers.length - 1 ? ", " : ""}</span>
-          ))
-        ) : (MSGS.no_manager)}
-      </h2>
+      <div className="app">
+        {/* MANAGERS */}
+        <h2>
+          {Plurals(managers, "Menejer")}
 
-      <br />
-      <hr />
-      <br />
-
-      <div className="employees-section align">
-        <h2>{Plurals(usersData, "Employee")}</h2>
-
-        {userDataForm ?
-          <IconButton handleClick={() => setUserDataForm(!true)} icon={SquareMinus} />
-          :
-          <IconButton handleClick={() => setUserDataForm(true)} icon={SquarePlus} />
-        }
-
-      </div>
-
-      <br />
-
-      <ul>
-        {usersData.length > 0
-          ? usersData.map((employee, index) => (
-            <ol key={index} className={employee.is_manager ? "manager" : "employee"}>
-              {employee.name}
-            </ol>
-          ))
-          : (MSGS.no_employee)}
-
-      </ul>
-      {userDataForm && <UsersForm onSubmit={handleFormSubmit} />}
-
-      <br />
-      <br />
-
-
-      <section>
-
-        <div className="income-section align">
-          <div className="align">
-            <h2>Incomes:</h2> ({DEFAULT_PERCENT}%)
-
-            {
-              usersData.length > 0 ?
-                dataForm ?
-                  <IconButton handleClick={() => setDataForm(!true)} icon={SquareMinus} />
-                  :
-                  <IconButton handleClick={() => setDataForm(true)} icon={SquarePlus} />
-                : null
-            }
-          </div>
-
-          <div className="align">
-            <IconButton handleClick={() => selectPrevMonth()} icon={SquareArrowLeft} />
-            <p className={"selectedMonth" + " " +(selectDate == dayjs(new Date()).format('YYYY-MM-DD') ? "active" : null)}>{dayjs(selectDate).format('MMMM')}</p>
-            <IconButton handleClick={() => selectNextMonth()} icon={SquareArrowRight} />
-          </div>
-        </div>
-
-        {dataForm && (
-          <IncomeForm
-            usersData={usersData}
-            onSubmit={handleIncomeFormSubmit}
-            dataFormSchema={dataFormSchema}
-            setDataFormSchema={setDataFormSchema}
-          />
-        )}
+          {
+            managers.map((manager, index) => (
+              <span key={index}> {manager.name}{index < managers.length - 1 ? ", " : ""}</span>
+            ))
+          }
+        </h2>
 
         <br />
+        <hr />
+        <br />
 
-        {data.map((employee) => (
-          <>
-            <details>
+        {/* EMPLOYEES */}
+        <div className="align">
+          <h2>{Plurals(data, "Xodim")}</h2>
+          {openForm !== "userData" && <Button handleClick={() => setOpenForm("userData")} icon={SquarePlus} />}
+        </div>
+        <br />
+        <ul>
+          {
+            data.map((employee, index) => (
+              <ol key={index} className={employee.role == "manager" ? "manager" : null}>
+                {employee.name}
+              </ol>
+            ))
+          }
+
+        </ul>
+
+        <br />
+        <br />
+
+        <section>
+          <div className="income-section align">
+            <div className="align">
+              <h2>Records:</h2> ({FINANCE_PERCENT}%)
+              {openForm !== "recordData" && <Button handleClick={() => setOpenForm("recordData")} icon={SquarePlus} />}
+            </div>
+
+            <div className="align">
+              <Button handleClick={selectPrevMonth} icon={SquareArrowLeft} disabled={isPrevDisabled} />
+              <p className="selectedMonth">
+                {dayjs().month(selectedMonth).year(selectedYear).format('MMMM')}
+              </p>
+              <Button handleClick={selectNextMonth} icon={SquareArrowRight} disabled={isNextDisabled} />
+            </div>
+          </div>
+
+          <br />
+
+          {filteredData.map((employee) => (
+            <details key={employee.id}>
               <summary key={employee.id}>
                 {employee.name}:&nbsp;
-                {PriceFormat(calculateEmployeeSalary(employee, DEFAULT_PERCENT))}
+                {formatCost(getEmployeeSalary(employee, FINANCE_PERCENT))}
               </summary>
 
               <table className="employee-records__table">
@@ -231,8 +194,8 @@ function App() {
                     employee.records.map((record) => (
                       <tr key={uuid()}>
                         <td className="date-table__body">{dayjs(record.date).format('MMMM D, YYYY')}</td>
-                        <td className="income-table__body">{record.income && PriceFormat(record.income)}</td>
-                        <td className="expense-table__body">{record.expense && PriceFormat(record.expense)}</td>
+                        <td className="income-table__body">{record.income && formatCost(record.income)}</td>
+                        <td className="expense-table__body">{record.expense && formatCost(record.expense)}</td>
                       </tr>
                     ))
                   }
@@ -240,8 +203,8 @@ function App() {
                     employee.records.length > 1 ?
                       <tr>
                         <td></td>
-                        <td className="income-table__total">{PriceFormat(calculateEmployeeTotalIncome(employee))}</td>
-                        <td className="expense-table__total">{PriceFormat(calculateEmployeeTotalExpense(employee))}</td>
+                        <td className="income-table__total">{formatCost(getEmployeeTotalIncome(employee))}</td>
+                        <td className="expense-table__total">{formatCost(getEmployeeTotalExpense(employee))}</td>
                       </tr>
                       :
                       null
@@ -250,30 +213,115 @@ function App() {
                 </tbody>
               </table>
             </details>
+          ))}
 
-          </>
-
-        ))}
-
-        <br />
-
-        <div className="">
-          <h4>
-            <span>Total Income:  {totalIncomes | totalIncomes && PriceFormat(totalIncomes)} </span>
-
-            <span>| Total Expense: {totalExpenses | totalExpenses && PriceFormat(totalExpenses)}</span>
-          </h4>
-          <hr />
           <br />
-          <h4>Net Income: {(totalIncomes & netIncome) && PriceFormat(totalIncomes - netIncome)}</h4>
+
+          <div>
+            <h4>
+              <span>Total Income:  {formatCost(totalIncomes)} </span>
+
+              <span>| Total Expense: {formatCost(totalExpenses)}</span>
+            </h4>
+            <hr />
+            <br />
+            <h4>Net Income: 0</h4>
+
+          </div>
+
+        </section>
+      </div>
+
+
+      {/* ASIDE FOR FORM */}
+      {/* <button onClick={() => setOpenForm(!openForm)}>open the form</button> */}
+      <aside className={openForm == "userData" || openForm == "recordData" ? "active" : null}>
+        <div className="form">
+          <div className="form__title">
+            <h2>{openForm === "userData" && "New employee"}{openForm === "recordData" && "New record"}</h2>
+            <PanelRightClose size={20} className="form__close-button" onClick={() => setOpenForm("closed")} />
+          </div>
+          <br />
+          <br />
+          <div>
+            {
+              openForm === "userData" && <UserDataForm />
+              ||
+              openForm === "recordData" && <RecordDataForm />
+            }
+          </div>
 
         </div>
-
-      </section>
-
+      </aside>
 
     </main>
   );
 }
 
 export default App;
+
+
+function UserDataForm() {
+  return (
+    <form>
+      <div className="form__group">
+        <div>
+          <label htmlFor="name">Full name:</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="role">Role:</label>
+          <label id="role" name="employee">
+            <input
+              type="radio"
+              value="employee"
+              name="role"
+            /> Employee
+          </label>
+          <label id="role" name="manager">
+            <input
+              type="radio"
+              value="manager"
+              name="role"
+            /> Manager
+          </label>
+        </div>
+      </div>
+
+      <button className="form-button">Save</button>
+    </form>
+  )
+}
+function RecordDataForm() {
+  return (
+    <form>
+      <div className="form__group">
+        <div>
+          <label htmlFor="user">Select employees:</label>
+          <select name="user" id="user" required>
+            {
+              dataDB.map((employee) => (
+                <option key={employee.id} value={employee.name}>{employee.name}</option>
+              ))
+            }
+          </select>
+        </div>
+        <div>
+          <label htmlFor="income">Income:</label>
+          <input type="number" id="income" name="income" min={0} required defaultValue={0} />
+        </div>
+        <div>
+          <label htmlFor="expence">Expence:</label>
+          <input type="number" id="expence" name="expence" min={0} required defaultValue={0} />
+        </div>
+      </div>
+
+      <button className="form-button">Save</button>
+    </form>
+  )
+}

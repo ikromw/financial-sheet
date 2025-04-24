@@ -1,20 +1,35 @@
+:root {
+  --light: #eee;
+  --overlay-light: #f1f1f1;
+  --gray: #ddd;
+  --overlay-light: #e3e3e3;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: consolas;
+  font-family: consolas !important;
   line-height: 1.6rem;
 }
 
 body {
   padding: 2rem;
-  background: #eeeeee;
+  background: var(--light);
+}
+
+input,
+button,
+select {
+  border: none;
+  outline: none;
+  color: #666;
 }
 
 hr {
   border: none;
   height: .1px;
-  background: #ddd;
+  background: var(--gray);
 }
 
 #app {

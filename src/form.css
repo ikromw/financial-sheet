@@ -1,0 +1,55 @@
+form {
+    height: 100vh;
+    position: relative;
+}
+
+form input,
+form select {
+    padding: 0.8rem;
+    border: 1px solid var(--gray);
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.form__group {
+    display: flex;
+    padding: 0 2rem;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form__group div {
+    display: flex;
+    flex-direction: column;
+}
+
+.form__group label {
+    margin-bottom: 10px;
+    user-select: none;
+    cursor: pointer;
+}
+.form__group label:hover{
+    opacity: 0.5;
+}
+.form__group label:active{
+    transform: scale(0.99);
+}
+
+.form-button {
+    position: absolute;
+    text-align: center;
+    cursor: pointer;
+    bottom: 7rem;
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 5px;
+    font-size: 16px;
+    background: #dddddd56;
+}
+
+.form-button:hover {
+    background: #ddd;
+}
+.form-button:active{
+    transform: scale(0.99);
+}
