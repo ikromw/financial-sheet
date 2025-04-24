@@ -1,6 +1,6 @@
 # Simple Financial Sheet 📊
 
-This is a very very easy-to-use dashboard. it is only managed by managers and employee sections. Firstly, you add some employees and get an access to add incomes and outcomes with users.
+This is a very very easy-to-use financial dashboard and the system is very friendly :). it is managed by role of managers. you get info about incomes & expences monthly through filter.
 
 > [!NOTE]
 > No data storage.
