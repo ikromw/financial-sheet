@@ -28,10 +28,12 @@ form select {
     user-select: none;
     cursor: pointer;
 }
-.form__group label:hover{
+
+.form__group label:hover {
     opacity: 0.5;
 }
-.form__group label:active{
+
+.form__group label:active {
     transform: scale(0.99);
 }
 
@@ -50,6 +52,24 @@ form select {
 .form-button:hover {
     background: #ddd;
 }
-.form-button:active{
+
+.form-button:active {
     transform: scale(0.99);
+}
+
+
+.app-form {
+    max-width: 300px;
+    float: right;
+}
+
+.app-form form {
+    height: unset;
+    display: grid;
+    gap: 1rem;
+    padding: unset;
+}
+
+.app-form .form-button {
+    position: unset;
 }

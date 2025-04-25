@@ -3,7 +3,7 @@
 This is a very very easy-to-use dashboard. it is only managed by managers and employee sections. Firstly, you add some employees and get an access to add incomes and outcomes with users.
 
 > [!NOTE]
-> No data storage.
+> No data storage. Now working on serverside.
 
 ## Tech stack
 - HTML

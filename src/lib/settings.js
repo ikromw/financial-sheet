@@ -1,1 +1,1 @@
-export const FINANCE_PERCENT = 10;
+export const FINANCE_PERCENT = 3;

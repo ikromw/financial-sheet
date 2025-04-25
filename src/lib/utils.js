@@ -1,12 +1,12 @@
 // Format cost
 export const formatCost = (number) => {
     if (!number) return 0;
-    return number.toLocaleString()
+    return Number(number).toLocaleString("en-US")
 }
 
 // Plurals title
 export const Plurals = (data, text) => {
-    return data.length > 1 ? text + "lar: " : text + ": "
+    return data.length > 1 ? text + "s:" : text + ": "
 }
 
 
@@ -20,11 +20,11 @@ export const getEmployeeSalary = (employee, FINANCE_PERCENT) => {
         return 0;
     }
     const totalSalary = employee.records.reduce(
-        (sum, record) => sum + record.income * (FINANCE_PERCENT / 100), 0
+        (sum, record) => sum + Number(record.income) * (FINANCE_PERCENT / 100), 0
     );
 
     const expenses = employee.records.reduce(
-        (sum, record) => sum + record.expense,
+        (sum, record) => sum + Number(record.expense),
         0
     );
 
@@ -39,7 +39,7 @@ export const getEmployeeTotalIncome = (employee) => {
 
     let totalIncome = 0;
     for (const record of employee.records) {
-        totalIncome += record.income;
+        totalIncome += Number(record.income);
     }
 
     return totalIncome;
@@ -53,7 +53,7 @@ export const getEmployeeTotalExpense = (employee) => {
 
     let totalExpense = 0;
     for (const record of employee.records) {
-        totalExpense += record.expense;
+        totalExpense += Number(record.expense);
     }
 
     return totalExpense;
@@ -71,7 +71,7 @@ export const getTotalIncome = (data) => {
     }
 
     const totalIncome = data.map(employee =>
-        employee.records.reduce((sum, record) => sum += record.income, 0)
+        employee.records.reduce((sum, record) => sum += Number(record.income), 0)
     )
     return totalIncome.reduce((sum, income) => sum + income, 0)
 }
@@ -85,7 +85,7 @@ export const getTotalExpenses = (data) => {
     let totalExpenses = 0;
     for (const employee of data) {
         for (const record of employee.records) {
-            totalExpenses += record.expense;
+            totalExpenses += Number(record.expense);
         }
     }
     return totalExpenses;
@@ -97,7 +97,7 @@ export const getNetIncome = (data, FINANCE_PERCENT) => {
         return 0;
     }
 
-    let totalSalaries = data.map((employee) => employee.records.reduce((sum, record) => sum + record.income * (FINANCE_PERCENT / 100), 0))
+    let totalSalaries = data.map((employee) => employee.records.reduce((sum, record) => sum + Number(record.income) * (FINANCE_PERCENT / 100), 0))
 
     return totalSalaries.reduce((sum, record) => sum + record);
 }

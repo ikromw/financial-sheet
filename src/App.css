@@ -30,13 +30,19 @@ main {
     transform: scale(.9);
 }
 
-.selectedMonth {
+.selectedMonth,
+.selectedYear {
     background: #f7f7f7;
+    color: #666;
     border: 1px solid #ddd;
     padding: 0 10px;
     border-radius: 5px;
-    min-width: 110px;
+    min-width: 105px;
     text-align: center;
+}
+
+.selectedYear {
+    min-width: 40px !important;
 }
 
 /*
@@ -64,7 +70,7 @@ aside.active {
     border-left: 5px solid #ddd;
     right: 0;
     top: 0;
-    padding: 20px ;
+    padding: 20px;
     transition: 0.3s;
 }
 
@@ -72,6 +78,25 @@ aside.active {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.form__close-button {
+    background: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+.form__close-button:hover {
+    opacity: 0.5;
+}
+.form__close-button:active {
+    transform: scale(.90);
 }
 
 

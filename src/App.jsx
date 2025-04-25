@@ -30,25 +30,12 @@ import {
   getTotalExpenses,
   getNetIncome
 } from "./lib/utils";
-const FORM_CONTROL = 'closed' | 'userData' | 'recordData';
 
 
 function App() {
   const [data, setData] = useState(dataDB)
   const [openForm, setOpenForm] = useState("closed")
-  // Form
-  const [userData, setUserData] = useState({
-    id: uuid(),
-    name: "",
-    role: "employee",
-    records: []
-  });
-  const [recordData, setRecordData] = useState({
-    date: dayjs().format("YYYY-MM-DD"),
-    income: 0,
-    expense: 0,
-    work: ""
-  });
+
   // Month filter
   const [selectedMonth, setSelectedMonth] = useState(dayjs().month());
   const [selectedYear, setSelectedYear] = useState(dayjs().year());
@@ -71,6 +58,27 @@ function App() {
     }
   };
 
+  // Form handlers
+  const handleUserDataForm = (userData) => {
+    console.log("User Data: (add)", userData);
+    setData([...data, userData])
+    setOpenForm("closed")
+  }
+  const handleRecordDataForm = (recordData) => {
+    console.log("Record Data: (add)", recordData);
+
+    const employeeIndex = data.findIndex(employee => employee.id === recordData.employeeId);
+    if (employeeIndex !== -1) {
+      const updatedEmployee = {
+        ...data[employeeIndex],
+        records: [...data[employeeIndex].records, recordData]
+      };
+      const updatedData = [...data];
+      updatedData[employeeIndex] = updatedEmployee;
+      setData(updatedData);
+    }
+  }
+
   // Filtered data by month
   const filteredData = useMemo(() => {
     return data.map(employee => ({
@@ -82,23 +90,15 @@ function App() {
     }));
   }, [data, selectedMonth, selectedYear]);
 
-  // Form handlers
-  const setUserDataForm = (e) => {
-    const { name, value } = e.target;
-
-    setUserData({
-      ...data,
-      [e.target.name]: e.target.value
-    });
-  };
 
   // Utils
   const totalIncomes = useMemo(() => getTotalIncome(filteredData), [filteredData]);
   const totalExpenses = useMemo(() => getTotalExpenses(filteredData), [filteredData]);
   const netIncome = useMemo(() => getNetIncome(filteredData, FINANCE_PERCENT), [filteredData])
 
-  // Managers
+  // Managers and employees
   const managers = data.filter((manager) => manager.role === "manager");
+  const employees = data.map((employee) => ({ id: employee.id, name: employee.name }));
 
   // Find oldest and newest record dates
   const allRecords = data.flatMap(emp => emp.records);
@@ -111,8 +111,15 @@ function App() {
   if (data.length === 0) {
     return (
       <div className="app">
-        <h2>No data</h2>
-        <Button handleClick={() => setOpenForm(true)} icon={SquarePlus} />
+        <img src="/logo.svg" alt="logo" width={40} />
+        <h2>Welcome to the finance app!</h2>
+        <i>To get started, please add an employee.</i>
+        <br />
+        <hr />
+        <br />
+        <div className="app-form">
+          <UserDataForm onSubmitForm={handleUserDataForm} />
+        </div>
       </div>
     );
   }
@@ -122,15 +129,17 @@ function App() {
 
       <div className="app">
         {/* MANAGERS */}
-        <h2>
-          {Plurals(managers, "Menejer")}
+        <div className="align">
+          <h2>
+            {Plurals(managers, "Manager")}
 
-          {
-            managers.map((manager, index) => (
-              <span key={index}> {manager.name}{index < managers.length - 1 ? ", " : ""}</span>
-            ))
-          }
-        </h2>
+            {
+              managers.map((manager, index) => (
+                <span key={index}> {manager.name}{index < managers.length - 1 ? ", " : ""}</span>
+              ))
+            }
+          </h2>
+        </div>
 
         <br />
         <hr />
@@ -138,7 +147,7 @@ function App() {
 
         {/* EMPLOYEES */}
         <div className="align">
-          <h2>{Plurals(data, "Xodim")}</h2>
+          <h2>{Plurals(data, "Employee")}</h2>
           {openForm !== "userData" && <Button handleClick={() => setOpenForm("userData")} icon={SquarePlus} />}
         </div>
         <br />
@@ -165,10 +174,13 @@ function App() {
 
             <div className="align">
               <Button handleClick={selectPrevMonth} icon={SquareArrowLeft} disabled={isPrevDisabled} />
+              <Button handleClick={selectNextMonth} icon={SquareArrowRight} disabled={isNextDisabled} />
               <p className="selectedMonth">
                 {dayjs().month(selectedMonth).year(selectedYear).format('MMMM')}
               </p>
-              <Button handleClick={selectNextMonth} icon={SquareArrowRight} disabled={isNextDisabled} />
+              <p className="selectedYear">
+                {dayjs().month(selectedMonth).year(selectedYear).format('YYYY')}
+              </p>
             </div>
           </div>
 
@@ -193,7 +205,7 @@ function App() {
                   {
                     employee.records.map((record) => (
                       <tr key={uuid()}>
-                        <td className="date-table__body">{dayjs(record.date).format('MMMM D, YYYY')}</td>
+                        <td className="date-table__body">{dayjs(record.date).format('MMMM D')}</td>
                         <td className="income-table__body">{record.income && formatCost(record.income)}</td>
                         <td className="expense-table__body">{record.expense && formatCost(record.expense)}</td>
                       </tr>
@@ -225,7 +237,7 @@ function App() {
             </h4>
             <hr />
             <br />
-            <h4>Net Income: 0</h4>
+            <h4>Net Income: {formatCost(totalIncomes - netIncome)}</h4>
 
           </div>
 
@@ -239,15 +251,15 @@ function App() {
         <div className="form">
           <div className="form__title">
             <h2>{openForm === "userData" && "New employee"}{openForm === "recordData" && "New record"}</h2>
-            <PanelRightClose size={20} className="form__close-button" onClick={() => setOpenForm("closed")} />
+            <PanelRightClose size={10} className="form__close-button" onClick={() => setOpenForm("closed")} />
           </div>
           <br />
           <br />
           <div>
             {
-              openForm === "userData" && <UserDataForm />
+              openForm === "userData" && <UserDataForm onSubmitForm={handleUserDataForm} />
               ||
-              openForm === "recordData" && <RecordDataForm />
+              openForm === "recordData" && <RecordDataForm onSubmitForm={handleRecordDataForm} employeeData={employees} />
             }
           </div>
 
@@ -260,10 +272,36 @@ function App() {
 
 export default App;
 
+function UserDataForm({ onSubmitForm }) {
+  const [userData, setUserData] = useState({
+    id: "",
+    name: "",
+    role: "employee",
+    records: []
+  });
 
-function UserDataForm() {
+  const handleChange = (e) => {
+    const { name, value } = e.target
+
+    setUserData((prev) => ({
+      ...prev,
+      id: uuid(),
+      [name]: value,
+    }))
+  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmitForm(userData)
+
+    setUserData({
+      id: "",
+      name: "",
+      role: "employee",
+      records: []
+    })
+  }
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <div className="form__group">
         <div>
           <label htmlFor="name">Full name:</label>
@@ -271,6 +309,8 @@ function UserDataForm() {
             type="text"
             id="name"
             name="name"
+            value={userData.name}
+            onChange={handleChange}
             required
           />
         </div>
@@ -281,6 +321,8 @@ function UserDataForm() {
               type="radio"
               value="employee"
               name="role"
+              checked={userData.role === "employee"}
+              onChange={handleChange}
             /> Employee
           </label>
           <label id="role" name="manager">
@@ -288,6 +330,8 @@ function UserDataForm() {
               type="radio"
               value="manager"
               name="role"
+              checked={userData.role === "manager"}
+              onChange={handleChange}
             /> Manager
           </label>
         </div>
@@ -297,27 +341,84 @@ function UserDataForm() {
     </form>
   )
 }
-function RecordDataForm() {
+function RecordDataForm({ onSubmitForm, employeeData }) {
+  const [recordData, setRecordData] = useState({
+    id: "",
+    date: dayjs().format("YYYY-MM-DD"),
+    employeeId: employeeData.length > 0 ? employeeData[0].id : "",
+    income: 0,
+    expense: 0,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setRecordData((prev) => ({
+      ...prev,
+      id: uuid(),
+      [name]: value,
+    }))
+  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmitForm(recordData)
+
+    setRecordData({
+      id: "",
+      date: dayjs().format("YYYY-MM-DD"),
+      employeeId: employeeData.length > 0 ? employeeData[0].id : "",
+      income: 0,
+      expense: 0,
+      work: ""
+    })
+  }
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <div className="form__group">
         <div>
-          <label htmlFor="user">Select employees:</label>
-          <select name="user" id="user" required>
+          <label htmlFor="employeeId">Select employees:</label>
+          <select
+            name="employeeId"
+            id="user"
+            value={recordData.employeeId}
+            onChange={handleChange}
+            required
+          >
             {
-              dataDB.map((employee) => (
-                <option key={employee.id} value={employee.name}>{employee.name}</option>
+              employeeData.map((employee, i) => (
+                <option
+                  key={employee.id}
+                  value={employee.id}
+                >
+                  {employee.name}
+                </option>
               ))
             }
           </select>
         </div>
         <div>
           <label htmlFor="income">Income:</label>
-          <input type="number" id="income" name="income" min={0} required defaultValue={0} />
+          <input
+            type="number"
+            id="income"
+            name="income"
+            min={0}
+            value={recordData.income}
+            onChange={handleChange}
+            required
+          />
         </div>
         <div>
-          <label htmlFor="expence">Expence:</label>
-          <input type="number" id="expence" name="expence" min={0} required defaultValue={0} />
+          <label htmlFor="expense">Expense:</label>
+          <input
+            type="number"
+            id="expense"
+            name="expense"
+            min={0}
+            value={recordData.expense}
+            onChange={handleChange}
+            required
+          />
         </div>
       </div>
 

@@ -6,55 +6,11 @@
 //   income: number
 //   expense: number
 export const dataDB = [
-    {
-        id: 1,
-        name: "John Doe",
-        role: "manager",
-        records: [
-            {
-                id: 1,
-                date: "2025-04-24",
-                income: 100000,
-                expense: 0,
-                work: ""
-            },
-            {
-                id: 2,
-                date: "2024-02-01",
-                income: 1200,
-                expense: 600,
-                work: ""
-            },
-        ],
-    },
-    {
-        id: 2,
-        name: "Jane Smith",
-        role: "employee",
-        records: [
-            {
-                id: 1,
-                date: "2023-01-15",
-                income: 800,
-                expense: 300,
-                work: ""
-            },
-            {
-                id: 2,
-                date: "2023-02-15",
-                income: 900,
-                expense: 400,
-                work: ""
-            },
-        ],
-    },
-    {
-        id: 3,
-        name: "Alice Johnson",
-        role: "employee",
-        records: []
-    }
+    
 ]
+
+console.table(dataDB);
+
 
 
 // RELETIONAL DATABASE STYLE

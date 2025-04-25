@@ -1,1 +1,12 @@
-1. Fix the error when data's length == 0
+Remains
+- CRUD:
+    1. Create -- DONE
+    2. Read -- DONE
+    3. Update 
+    4. Delete 
+
+Improves
+- Analytics
+- Settings
+- Multilanguage
+- Export file to xlsx format.
